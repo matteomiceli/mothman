@@ -5,6 +5,10 @@ var speed = 4.0  # movement speed
 var jump_speed = 6.0  # determines jump height
 var mouse_sensitivity = 0.002  # turning speed
 
+# Jump
+var is_jumping = false
+
+# Dash
 var is_dashing = false
 var dash_force = 40
 const DASH_DECAY = 200
@@ -26,6 +30,10 @@ func get_input():
 func _physics_process(delta):
 	get_input()
 	velocity.y += -gravity * delta
+
+	if is_on_floor():
+		is_jumping = false
+
 	if is_dashing:
 		var decay_amount = DASH_DECAY * delta
 		if dash_velocity.length() <= decay_amount:
@@ -39,6 +47,9 @@ func _physics_process(delta):
 
 	move_and_slide()
 
-
 func jump():
-	velocity.y = 3
+	if is_jumping or not is_on_floor():
+		return
+
+	is_jumping = true
+	velocity.y = 5
