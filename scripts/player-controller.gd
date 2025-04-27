@@ -10,6 +10,10 @@ const DASH_FORCE = 40
 const DASH_DECAY = 200
 
 
+func _enter_tree() -> void:
+	# Set the player global value when this node is instantiated
+	Global.player = self
+
 func _physics_process(delta: float):
 	handle_movement(delta)
 	apply_gravity(delta)
