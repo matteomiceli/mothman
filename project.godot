@@ -13,7 +13,6 @@ config_version=5
 config/name="tag"
 run/main_scene="uid://c05byuu4pif4x"
 config/features=PackedStringArray("4.4", "Forward Plus")
-config/icon="res://icon.svg"
 
 [input]
 
