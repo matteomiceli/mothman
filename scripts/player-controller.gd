@@ -2,7 +2,8 @@ extends CharacterBody3D
 
 @onready var anim_tree = $PlayerModel/AnimationTree
 
-const SPEED := 6
+const MOVE_SPEED := 6
+const ACCELERATION := 90
 const JUMP_VELOCITY := 8
 const PLAYER_GRAVITY := Vector3(0, -20, 0)
 
@@ -13,6 +14,7 @@ var currAnim := IDLE
 var run_val: float = 0.0
 var jump_val: float = 0.0
 var dash_val: float = 0.0
+var target_rotation_y: float = 0.0
 
 # Dash
 var is_dashing := false
@@ -27,8 +29,8 @@ func _enter_tree() -> void:
 
 
 func _physics_process(delta: float):
-	handle_movement(delta)
 	apply_gravity(delta)
+	handle_movement(delta)
 	handle_animations(delta)
 
 	move_and_slide()
@@ -44,13 +46,18 @@ func handle_movement(delta: float):
 
 	# TODO: this feels like it wants to be distilled down to an `apply_speed_modifiers` function that
 	# applies all speed modifiers on the player, not just the dash modifier
-	velocity.x = (input_dir.x * SPEED) + dash_velocity.x
-	velocity.z = (input_dir.y * SPEED) + dash_velocity.z
+	velocity.x = move_toward(velocity.x, input_dir.x * MOVE_SPEED, ACCELERATION * delta)
+	velocity.z = move_toward(velocity.z, input_dir.y * MOVE_SPEED, ACCELERATION * delta)
 
  	# Handle player rotation
 	var look_direction := Vector3(input_dir.x, 0, input_dir.y)
-	if not global_position.is_equal_approx(global_position + look_direction):
-		self.look_at(global_position + look_direction)
+
+	if look_direction.length() > 0.1:
+		look_direction = look_direction.normalized()
+		target_rotation_y = atan2(-look_direction.x, -look_direction.z)
+
+	# Smoothly rotate toward target rotation
+	rotation.y = lerp_angle(rotation.y, target_rotation_y, 10.0 * delta)
 
 	if is_on_floor():
 		if velocity.is_zero_approx():
@@ -80,7 +87,6 @@ func handle_dash_decay(delta: float):
 	else:
 		dash_velocity = Vector3.ZERO
 		is_dashing = false
-
 
 func handle_animations(delta: float):
 	match currAnim:
