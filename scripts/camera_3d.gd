@@ -8,11 +8,11 @@ var initial_position: Vector3
 var follow_target := Global.player
 
 func _ready() -> void:
-	initial_position = self.position
+	initial_position = self.global_position
 	follow_target = Global.player
 
 func _physics_process(_delta: float) -> void:
 	# TODO-MM: Eventually we'll probably want some custom handling for y tracking
 	# as levels grow vertically
-	self.position = lerp(initial_position, follow_target.position, .6)
-	self.look_at(follow_target.position)
+	self.global_position = lerp(initial_position, follow_target.global_position, .6)
+	self.look_at(follow_target.global_position)

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://c05byuu4pif4x"]
+[gd_scene load_steps=5 format=3 uid="uid://c05byuu4pif4x"]
 
 [ext_resource type="PackedScene" uid="uid://6s1mmgwdx7un" path="res://scenes/floor.tscn" id="1_rwgxs"]
 [ext_resource type="PackedScene" uid="uid://c17h2tuj0i08t" path="res://scenes/player.tscn" id="2_4wyf3"]
 [ext_resource type="Script" uid="uid://c10xmvg2cs3yh" path="res://scripts/camera_3d.gd" id="3_4wyf3"]
+[ext_resource type="PackedScene" uid="uid://cby1gh4t28jlq" path="res://scenes/box.tscn" id="3_k0juu"]
 
 [node name="World" type="Node3D"]
 
@@ -10,6 +11,16 @@
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="Player" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 17.8267)
+
+[node name="Box" parent="." instance=ExtResource("3_k0juu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 8.10172)
+
+[node name="Box2" parent="." instance=ExtResource("3_k0juu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.110913, 10.1043)
+
+[node name="Box3" parent="." instance=ExtResource("3_k0juu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.79391)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.997549, 0.0658961, 0.0235181, -0.0570181, 0.570821, 0.819093, 0.0405504, -0.818426, 0.573179, 0, 15.5293, 4.87762)
