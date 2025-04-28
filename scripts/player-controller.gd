@@ -22,11 +22,9 @@ var dash_velocity: Vector3
 const DASH_FORCE = 40
 const DASH_DECAY = 200
 
-
 func _enter_tree() -> void:
 	# Set the player global value when this node is instantiated
 	Global.player = self
-
 
 func _physics_process(delta: float):
 	apply_gravity(delta)
@@ -35,23 +33,28 @@ func _physics_process(delta: float):
 
 	move_and_slide()
 
-
 func apply_gravity(delta: float):
 	if not is_on_floor():
 		velocity += PLAYER_GRAVITY * delta
 
 func handle_movement(delta: float):
 	var input_dir := Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
+	var input_velocity := Vector3(
+		input_dir.x * MOVE_SPEED,
+		0,
+		input_dir.y * MOVE_SPEED
+	)
+	
 	handle_dash_decay(delta)
 
 	# TODO: this feels like it wants to be distilled down to an `apply_speed_modifiers` function that
 	# applies all speed modifiers on the player, not just the dash modifier
-	velocity.x = move_toward(velocity.x, input_dir.x * MOVE_SPEED, ACCELERATION * delta)
-	velocity.z = move_toward(velocity.z, input_dir.y * MOVE_SPEED, ACCELERATION * delta)
+	var target_velocity := input_velocity + dash_velocity
+	velocity.x = move_toward(velocity.x, target_velocity.x, ACCELERATION * delta)
+	velocity.z = move_toward(velocity.z, target_velocity.z, ACCELERATION * delta)
 
  	# Handle player rotation
 	var look_direction := Vector3(input_dir.x, 0, input_dir.y)
-
 	if look_direction.length() > 0.1:
 		look_direction = look_direction.normalized()
 		target_rotation_y = atan2(-look_direction.x, -look_direction.z)
@@ -71,11 +74,12 @@ func handle_movement(delta: float):
 			currAnim = JUMP
 
 	if Input.is_action_just_pressed("dash"):
+		print(is_dashing)
 		if not is_dashing:
 			is_dashing = true
+			print(is_dashing)
 			dash_velocity.x = input_dir.x * DASH_FORCE
 			dash_velocity.z = input_dir.y * DASH_FORCE
-
 
 func handle_dash_decay(delta: float):
 	if not is_dashing:
