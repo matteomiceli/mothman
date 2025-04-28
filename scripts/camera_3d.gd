@@ -12,5 +12,7 @@ func _ready() -> void:
 	follow_target = Global.player
 
 func _physics_process(_delta: float) -> void:
-	self.position = lerp(initial_position, follow_target.position, .4)
+	# TODO-MM: Eventually we'll probably want some custom handling for y tracking
+	# as levels grow vertically
+	self.position = lerp(initial_position, follow_target.position, .6)
 	self.look_at(follow_target.position)
