@@ -31,3 +31,13 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 0.797542, 0.603263, 0, -0.603263, 0.797542, -0.0660871, 20.2415, 42.5806)
 fov = 50.6
 script = ExtResource("3_4wyf3")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="DashCooldownBar" type="ProgressBar" parent="CanvasLayer"]
+custom_minimum_size = Vector2(11, 11)
+offset_right = 200.0
+offset_bottom = 27.0
+scale = Vector2(2, 2)
+size_flags_horizontal = 3
+max_value = 1.0

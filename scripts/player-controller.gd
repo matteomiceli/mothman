@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 @onready var anim_tree = $PlayerModel/AnimationTree
+@onready var dash_bar = get_tree().get_root().get_node("World/CanvasLayer/DashCooldownBar")
 
 const MOVE_SPEED := 6
 const ACCELERATION := 90
@@ -21,12 +22,23 @@ var is_dashing := false
 var dash_velocity: Vector3
 const DASH_FORCE = 40
 const DASH_DECAY = 200
+const DASH_COOLDOWN := 1
+var dash_cooldown_timer: float = 2.0
 
 func _enter_tree() -> void:
 	# Set the player global value when this node is instantiated
 	Global.player = self
 
 func _physics_process(delta: float):
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer -= delta
+	
+	if dash_bar:
+		if DASH_COOLDOWN > 0:
+			dash_bar.value = (DASH_COOLDOWN - dash_cooldown_timer)/DASH_COOLDOWN
+		else:
+			dash_bar.value = 1.0
+		
 	apply_gravity(delta)
 	handle_movement(delta)
 	handle_animations(delta)
@@ -39,11 +51,10 @@ func apply_gravity(delta: float):
 
 func handle_movement(delta: float):
 	var input_dir := Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
-	var input_velocity := Vector3(
-		input_dir.x * MOVE_SPEED,
-		0,
-		input_dir.y * MOVE_SPEED
-	)
+	var input_velocity := Vector3(input_dir.x * MOVE_SPEED, 0, input_dir.y * MOVE_SPEED)
+	
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer = max(dash_cooldown_timer - delta, 0)
 	
 	handle_dash_decay(delta)
 
@@ -58,8 +69,7 @@ func handle_movement(delta: float):
 	if look_direction.length() > 0.1:
 		look_direction = look_direction.normalized()
 		target_rotation_y = atan2(-look_direction.x, -look_direction.z)
-
-	# Smoothly rotate toward target rotation
+	# lerp_angle for smoothing
 	rotation.y = lerp_angle(rotation.y, target_rotation_y, 10.0 * delta)
 
 	if is_on_floor():
@@ -73,11 +83,10 @@ func handle_movement(delta: float):
 			velocity.y = JUMP_VELOCITY
 			currAnim = JUMP
 
-	if Input.is_action_just_pressed("dash"):
-		print(is_dashing)
+	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
 		if not is_dashing:
 			is_dashing = true
-			print(is_dashing)
+			dash_cooldown_timer = DASH_COOLDOWN
 			dash_velocity.x = input_dir.x * DASH_FORCE
 			dash_velocity.z = input_dir.y * DASH_FORCE
 
