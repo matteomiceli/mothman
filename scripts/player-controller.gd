@@ -30,18 +30,10 @@ func _enter_tree() -> void:
 	Global.player = self
 
 func _physics_process(delta: float):
-	if dash_cooldown_timer > 0:
-		dash_cooldown_timer -= delta
-	
-	if dash_bar:
-		if DASH_COOLDOWN > 0:
-			dash_bar.value = (DASH_COOLDOWN - dash_cooldown_timer)/DASH_COOLDOWN
-		else:
-			dash_bar.value = 1.0
-		
 	apply_gravity(delta)
 	handle_movement(delta)
 	handle_animations(delta)
+	handle_dash_cooldown(delta)
 
 	move_and_slide()
 
@@ -52,10 +44,10 @@ func apply_gravity(delta: float):
 func handle_movement(delta: float):
 	var input_dir := Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
 	var input_velocity := Vector3(input_dir.x * MOVE_SPEED, 0, input_dir.y * MOVE_SPEED)
-	
+
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer = max(dash_cooldown_timer - delta, 0)
-	
+
 	handle_dash_decay(delta)
 
 	# TODO: this feels like it wants to be distilled down to an `apply_speed_modifiers` function that
@@ -87,8 +79,7 @@ func handle_movement(delta: float):
 		if not is_dashing:
 			is_dashing = true
 			dash_cooldown_timer = DASH_COOLDOWN
-			dash_velocity.x = input_dir.x * DASH_FORCE
-			dash_velocity.z = input_dir.y * DASH_FORCE
+			dash_velocity = Vector3(input_dir.x, 0, input_dir.y) * DASH_FORCE
 
 func handle_dash_decay(delta: float):
 	if not is_dashing:
@@ -100,6 +91,17 @@ func handle_dash_decay(delta: float):
 	else:
 		dash_velocity = Vector3.ZERO
 		is_dashing = false
+
+func handle_dash_cooldown(delta: float):
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer -= delta
+
+	if dash_bar:
+		if DASH_COOLDOWN > 0:
+			dash_bar.value = (DASH_COOLDOWN - dash_cooldown_timer) / DASH_COOLDOWN
+		else:
+			dash_bar.value = 1.0
+
 
 func handle_animations(delta: float):
 	match currAnim:
