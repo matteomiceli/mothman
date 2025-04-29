@@ -14,6 +14,10 @@ config/name="tag"
 run/main_scene="uid://c05byuu4pif4x"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
+[global_group]
+
+walls=""
+
 [input]
 
 dash={

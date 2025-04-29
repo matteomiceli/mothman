@@ -25,6 +25,13 @@ const DASH_DECAY = 200
 const DASH_COOLDOWN := 1
 var dash_cooldown_timer: float = 2.0
 
+# Wall Run
+const WALL_RUN_DURATION = 100  # seconds
+const WALL_RUN_GRAVITY = -1.0  # slightly push into wall
+var is_wall_running = false
+var wall_run_timer = 100.0
+var wall_normal = Vector3.ZERO
+
 func _enter_tree() -> void:
 	# Set the player global value when this node is instantiated
 	Global.player = self
@@ -32,14 +39,31 @@ func _enter_tree() -> void:
 func _physics_process(delta: float):
 	apply_gravity(delta)
 	handle_movement(delta)
+	handle_wall_run(delta)
 	handle_animations(delta)
 	handle_dash_cooldown(delta)
-
 	move_and_slide()
+	detect_wall_run()
+
+func _on_body_entered(body):
+	if not is_on_floor() and not is_wall_running:
+		if body.is_in_group("walls"):  # ← Make sure walls are tagged as "walls"
+			var collision = get_last_slide_collision()
+			if collision:
+				start_wall_run(collision.normal)
 
 func apply_gravity(delta: float):
-	if not is_on_floor():
+	if not is_on_floor() and not is_wall_running:
 		velocity += PLAYER_GRAVITY * delta
+
+func detect_wall_run():
+	if not is_on_floor() and not is_wall_running:
+		for i in range(get_slide_collision_count()):
+			var collision = get_slide_collision(i)
+			if collision.get_collider().is_in_group("walls"):
+				print("Wall detected:", collision.get_collider().name)
+				start_wall_run(collision.get_normal())
+				break
 
 func handle_movement(delta: float):
 	var input_dir := Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
@@ -102,6 +126,24 @@ func handle_dash_cooldown(delta: float):
 		else:
 			dash_bar.value = 1.0
 
+func handle_wall_run(delta: float):
+	if is_wall_running:
+		wall_run_timer -= delta
+		velocity.y = WALL_RUN_GRAVITY
+
+		if wall_run_timer <= 0.0 or is_on_floor():
+			stop_wall_run()
+
+func start_wall_run(new_wall_normal: Vector3):
+	if not is_wall_running:
+		is_wall_running = true
+		wall_run_timer = WALL_RUN_DURATION
+		wall_normal = new_wall_normal
+		velocity.y = 0  # Cancel downward fall instantly
+
+func stop_wall_run():
+	is_wall_running = false
+	wall_normal = Vector3.ZERO
 
 func handle_animations(delta: float):
 	match currAnim:
