@@ -98,7 +98,7 @@ func handle_dash_cooldown(delta: float):
 
 	if dash_bar:
 		if DASH_COOLDOWN > 0:
-			dash_bar.value = (DASH_COOLDOWN - dash_cooldown_timer) / DASH_COOLDOWN
+			dash_bar.value = DASH_COOLDOWN - dash_cooldown_timer
 		else:
 			dash_bar.value = 1.0
 
