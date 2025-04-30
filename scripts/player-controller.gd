@@ -10,10 +10,11 @@ const PLAYER_GRAVITY := Vector3(0, -20, 0)
 
 # Animations
 const BLEND_SPEED := 15
-enum {IDLE, RUN, JUMP, DASH}
+enum {IDLE, RUN, JUMP, DASH, WALL_RUN}
 var currAnim := IDLE
 var run_val: float = 0.0
 var dash_val: float = 0.0
+var wallrun_val: float = 0.0
 var target_rotation_y: float = 0.0
 
 # Dash
@@ -139,6 +140,7 @@ func handle_wall_run(delta: float):
 func start_wall_run(new_wall_normal: Vector3):
 	if not is_wall_running:
 		is_wall_running = true
+		currAnim = WALL_RUN
 		wall_run_timer = WALL_RUN_DURATION
 		wall_normal = new_wall_normal
 		velocity.y = 0 # Cancel downward fall instantly
@@ -148,26 +150,30 @@ func stop_wall_run():
 	wall_normal = Vector3.ZERO
 
 func handle_animations(delta: float):
+	var run_target := 0.0
+	var dash_target := 0.0
+	var wallrun_target := 0.0
+
 	match currAnim:
 		IDLE:
-			run_val = lerpf(run_val, 0, delta * BLEND_SPEED)
-			dash_val = lerpf(dash_val, 0, delta * BLEND_SPEED)
+			run_target = 0.0
 		RUN:
-			run_val = lerpf(run_val, 1, delta * BLEND_SPEED)
-			dash_val = lerpf(dash_val, 0, delta * BLEND_SPEED)
-		JUMP:
-			run_val = lerpf(run_val, 0, delta * BLEND_SPEED)
-			dash_val = lerpf(dash_val, 0, delta * BLEND_SPEED)
-		# TODO
+			run_target = 1.0
 		DASH:
-			run_val = lerpf(run_val, 0, delta * BLEND_SPEED)
-			dash_val = lerpf(dash_val, 1, delta * BLEND_SPEED)
+			dash_target = 1.0
+		WALL_RUN:
+			wallrun_target = 1.0
+
+	# Smooth blending
+	run_val = lerpf(run_val, run_target, delta * BLEND_SPEED)
+	dash_val = lerpf(dash_val, dash_target, delta * BLEND_SPEED)
+	wallrun_val = lerpf(wallrun_val, wallrun_target, delta * BLEND_SPEED)
 
 	update_animation_blend_values()
 
 func fire_jump_animation():
 	currAnim = JUMP
- 	# TODO: in the near future, consider a proper FSM to deal with platyer state
+	# TODO: Eventually replace this system with FSM
 	anim_tree.set(
 		"parameters/fire_jump/request",
 		AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FIRE
@@ -175,4 +181,5 @@ func fire_jump_animation():
 
 func update_animation_blend_values():
 	anim_tree.set("parameters/to_run/blend_amount", run_val)
-	#anim_tree["parameters/to_dash/blend_amount"] = dash_val
+	anim_tree.set("parameters/to_dash/blend_amount", dash_val)
+	anim_tree.set("parameters/to_wallrun/blend_amount", wallrun_val)
