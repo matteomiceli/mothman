@@ -94,9 +94,12 @@ func handle_movement(delta: float):
 			currAnim = RUN
 
 	if Input.is_action_just_pressed("jump"):
-		if is_on_floor():
+		if is_on_floor() or is_wall_running:
 			velocity.y = JUMP_VELOCITY
 			fire_jump_animation()
+
+			if is_wall_running:
+				stop_wall_run()
 
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
 		if not is_dashing:
