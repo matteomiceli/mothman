@@ -13,7 +13,6 @@ const BLEND_SPEED := 15
 enum {IDLE, RUN, JUMP, DASH}
 var currAnim := IDLE
 var run_val: float = 0.0
-var jump_val: float = 0.0
 var dash_val: float = 0.0
 var target_rotation_y: float = 0.0
 
@@ -26,8 +25,8 @@ const DASH_COOLDOWN := 1
 var dash_cooldown_timer: float = 2.0
 
 # Wall Run
-const WALL_RUN_DURATION = 100  # seconds
-const WALL_RUN_GRAVITY = -1.0  # slightly push into wall
+const WALL_RUN_DURATION = 100 # seconds
+const WALL_RUN_GRAVITY = -1.0 # slightly push into wall
 var is_wall_running = false
 var wall_run_timer = 100.0
 var wall_normal = Vector3.ZERO
@@ -47,7 +46,7 @@ func _physics_process(delta: float):
 
 func _on_body_entered(body):
 	if not is_on_floor() and not is_wall_running:
-		if body.is_in_group("walls"):  # ← Make sure walls are tagged as "walls"
+		if body.is_in_group("walls"): # ← Make sure walls are tagged as "walls"
 			var collision = get_last_slide_collision()
 			if collision:
 				start_wall_run(collision.normal)
@@ -97,7 +96,7 @@ func handle_movement(delta: float):
 	if Input.is_action_just_pressed("jump"):
 		if is_on_floor():
 			velocity.y = JUMP_VELOCITY
-			currAnim = JUMP
+			fire_jump_animation()
 
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
 		if not is_dashing:
@@ -139,7 +138,7 @@ func start_wall_run(new_wall_normal: Vector3):
 		is_wall_running = true
 		wall_run_timer = WALL_RUN_DURATION
 		wall_normal = new_wall_normal
-		velocity.y = 0  # Cancel downward fall instantly
+		velocity.y = 0 # Cancel downward fall instantly
 
 func stop_wall_run():
 	is_wall_running = false
@@ -149,25 +148,28 @@ func handle_animations(delta: float):
 	match currAnim:
 		IDLE:
 			run_val = lerpf(run_val, 0, delta * BLEND_SPEED)
-			jump_val = lerpf(jump_val, 0, delta * BLEND_SPEED)
 			dash_val = lerpf(dash_val, 0, delta * BLEND_SPEED)
 		RUN:
 			run_val = lerpf(run_val, 1, delta * BLEND_SPEED)
-			jump_val = lerpf(jump_val, 0, delta * BLEND_SPEED)
 			dash_val = lerpf(dash_val, 0, delta * BLEND_SPEED)
 		JUMP:
 			run_val = lerpf(run_val, 0, delta * BLEND_SPEED)
-			jump_val = lerpf(jump_val, 1, delta * BLEND_SPEED)
 			dash_val = lerpf(dash_val, 0, delta * BLEND_SPEED)
 		# TODO
 		DASH:
 			run_val = lerpf(run_val, 0, delta * BLEND_SPEED)
-			jump_val = lerpf(jump_val, 0, delta * BLEND_SPEED)
 			dash_val = lerpf(dash_val, 1, delta * BLEND_SPEED)
 
-	update_blend_values()
+	update_animation_blend_values()
 
-func update_blend_values():
-	anim_tree["parameters/to_run/blend_amount"] = run_val
-	anim_tree["parameters/to_jump/blend_amount"] = jump_val
+func fire_jump_animation():
+	currAnim = JUMP
+ 	# TODO: in the near future, consider a proper FSM to deal with platyer state
+	anim_tree.set(
+		"parameters/fire_jump/request",
+		AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FIRE
+	)
+
+func update_animation_blend_values():
+	anim_tree.set("parameters/to_run/blend_amount", run_val)
 	#anim_tree["parameters/to_dash/blend_amount"] = dash_val
