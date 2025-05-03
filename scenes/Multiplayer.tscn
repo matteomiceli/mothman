@@ -1,0 +1,66 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvek0nhlil3d0"]
+
+[ext_resource type="PackedScene" uid="uid://c05byuu4pif4x" path="res://scenes/world.tscn" id="1_t1ser"]
+[ext_resource type="Script" uid="uid://g30vtoijtak" path="res://scenes/multiplayer.gd" id="2_8fwmw"]
+
+[node name="Multiplayer" type="Node"]
+script = ExtResource("2_8fwmw")
+
+[node name="World" parent="." instance=ExtResource("1_t1ser")]
+
+[node name="ServerMenu" type="Control" parent="."]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 646.0
+
+[node name="ItemList" type="ItemList" parent="ServerMenu"]
+layout_mode = 0
+offset_right = 1151.0
+offset_bottom = 642.0
+
+[node name="Label" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 135.0
+offset_right = 126.0
+offset_bottom = 164.0
+text = "Server shit:"
+vertical_alignment = 1
+
+[node name="or" type="Label" parent="ServerMenu/ItemList"]
+offset_left = 62.0
+offset_top = 277.0
+offset_right = 160.0
+offset_bottom = 306.0
+text = "or"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ip" type="LineEdit" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 51.0
+offset_top = 318.0
+offset_right = 248.0
+offset_bottom = 358.0
+scale = Vector2(0.963334, 0.996)
+placeholder_text = "ip_address:port"
+
+[node name="host" type="Button" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 219.0
+offset_right = 172.0
+offset_bottom = 265.0
+text = "Host"
+
+[node name="client_connect" type="Button" parent="ServerMenu/ItemList"]
+offset_left = 254.0
+offset_top = 318.0
+offset_right = 374.0
+offset_bottom = 359.0
+text = "Connect"
+
+[connection signal="pressed" from="ServerMenu/ItemList/host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="ServerMenu/ItemList/client_connect" to="." method="_on_client_pressed"]

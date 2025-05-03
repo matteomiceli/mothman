@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="tag"
-run/main_scene="uid://c05byuu4pif4x"
+run/main_scene="uid://dvek0nhlil3d0"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
 [global_group]
