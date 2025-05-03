@@ -10,11 +10,12 @@ const PLAYER_GRAVITY := Vector3(0, -20, 0)
 
 # Animations
 const BLEND_SPEED := 15
-enum {IDLE, RUN, JUMP, DASH, WALL_RUN}
+enum {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
 var currAnim := IDLE
 var run_val: float = 0.0
 var dash_val: float = 0.0
 var wallrun_val: float = 0.0
+var falling_val: float = 0.0
 var target_rotation_y: float = 0.0
 
 # Dash
@@ -55,6 +56,14 @@ func _on_body_entered(body):
 func apply_gravity(delta: float):
 	if not is_on_floor() and not is_wall_running:
 		velocity += PLAYER_GRAVITY * delta
+
+		if velocity.y < -3:
+			anim_tree.set(
+				"parameters/fire_jump/request",
+				AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FADE_OUT
+			)
+			currAnim = FALL
+
 
 func detect_wall_run():
 	if not is_on_floor() and not is_wall_running:
@@ -153,6 +162,7 @@ func handle_animations(delta: float):
 	var run_target := 0.0
 	var dash_target := 0.0
 	var wallrun_target := 0.0
+	var fall_target := 0.0
 
 	match currAnim:
 		IDLE:
@@ -163,11 +173,17 @@ func handle_animations(delta: float):
 			dash_target = 1.0
 		WALL_RUN:
 			wallrun_target = 1.0
+		FALL:
+			fall_target = 1.0
 
 	# Smooth blending
 	run_val = lerpf(run_val, run_target, delta * BLEND_SPEED)
 	dash_val = lerpf(dash_val, dash_target, delta * BLEND_SPEED)
 	wallrun_val = lerpf(wallrun_val, wallrun_target, delta * BLEND_SPEED)
+
+	# We want transitions to falling animation to be smoother
+	var falling_mod = 0.2
+	falling_val = lerpf(falling_val, fall_target, delta * (BLEND_SPEED * falling_mod))
 
 	update_animation_blend_values()
 
@@ -183,3 +199,4 @@ func update_animation_blend_values():
 	anim_tree.set("parameters/to_run/blend_amount", run_val)
 	anim_tree.set("parameters/to_dash/blend_amount", dash_val)
 	anim_tree.set("parameters/to_wallrun/blend_amount", wallrun_val)
+	anim_tree.set("parameters/to_falling/blend_amount", falling_val)
