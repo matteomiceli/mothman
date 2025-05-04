@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dvek0nhlil3d0"]
 
 [ext_resource type="PackedScene" uid="uid://c05byuu4pif4x" path="res://scenes/world.tscn" id="1_t1ser"]
-[ext_resource type="Script" uid="uid://g30vtoijtak" path="res://scenes/multiplayer.gd" id="2_8fwmw"]
+[ext_resource type="Script" uid="uid://g30vtoijtak" path="res://scripts/multiplayer.gd" id="2_8fwmw"]
 
 [node name="Multiplayer" type="Node"]
 script = ExtResource("2_8fwmw")
@@ -30,6 +30,7 @@ text = "Server shit:"
 vertical_alignment = 1
 
 [node name="or" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
 offset_left = 62.0
 offset_top = 277.0
 offset_right = 160.0
@@ -56,6 +57,7 @@ offset_bottom = 265.0
 text = "Host"
 
 [node name="client_connect" type="Button" parent="ServerMenu/ItemList"]
+layout_mode = 0
 offset_left = 254.0
 offset_top = 318.0
 offset_right = 374.0
