@@ -1,16 +1,5 @@
 extends CharacterBody3D
 
-#@onready var player_input_sync = $PlayerInputSync
-
-# Used in multiplayer
-@export var id: int:
-	set(id):
-		id = id
-		# Give authority over the player input to the appropriate peer.
-		$PlayerInputSync.set_multiplayer_authority(id)
-
-@onready var input_dir = $PlayerInputSync.input_dir
-
 @onready var anim_tree = $PlayerModel/AnimationTree
 @onready var dash_bar = get_tree().get_root().get_node("World/CanvasLayer/DashCooldownBar")
 
@@ -47,8 +36,15 @@ var wall_normal = Vector3.ZERO
 func _enter_tree() -> void:
 	# Set the player global value when this node is instantiated
 	Global.player = self
+	set_multiplayer_authority(name.to_int())
+
+	print("name: ", name)
+	print("id: ", multiplayer.get_unique_id())
+	print("auth: ", get_multiplayer_authority())
+	print("---")
 
 func _physics_process(delta: float):
+	if not is_multiplayer_authority(): return
 	apply_gravity(delta)
 	handle_movement(delta)
 	handle_wall_run(delta)
@@ -86,7 +82,7 @@ func detect_wall_run():
 				break
 
 func handle_movement(delta: float):
-	input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
+	var input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
 	var input_velocity := Vector3(input_dir.x * MOVE_SPEED, 0, input_dir.y * MOVE_SPEED)
 
 	if dash_cooldown_timer > 0:

@@ -15,14 +15,16 @@ func setup_multiplayer():
 	for id in multiplayer.get_peers():
 		add_player(id)
 
-	# Add a player on the host system if not a dedicated server
-	if not OS.has_feature("dedicated_server"):
-		add_player(1)
-
 func add_player(id: int):
-	print("ADD", id)
 	var player = preload("res://scenes/player.tscn").instantiate()
-	player.id = id
+	player.name = str(id)
+
+	if len(multiplayer.get_peers()) > 0:
+		# TODO - This positioning doesn't work yet - this forum thread might help
+		# https://forum.godotengine.org/t/setting-position-on-spawn-in-multiplayer-causes-client-to-spawn-at-0-0-0/78584/7
+		player.position.x += 10
+
+
 	$PlayersSpawn.add_child(player, true)
 
 

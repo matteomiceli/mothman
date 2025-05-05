@@ -21,6 +21,9 @@ func _on_host_pressed():
 		OS.alert("Failed to host game.")
 		return
 	multiplayer.multiplayer_peer = peer
+	
+	# Add server host player to game
+	$World.add_player(1)
 	start_game()
 
 func _on_client_pressed():
