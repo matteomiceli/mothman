@@ -22,8 +22,22 @@ func _physics_process(_delta: float) -> void:
 		if player != null:
 			avg_pos += player.global_position
 	avg_pos /= players.size()
-	
-	# TODO-MM: Eventually we'll probably want some custom handling for y tracking
-	# as levels grow vertically
-	global_position = lerp(initial_position, avg_pos, .6)
-	look_at(avg_pos)
+
+	# Calculate max distance between players
+	var max_distance := 0.0
+	for i in range(players.size()):
+		for j in range(i + 1, players.size()):
+			var d = players[i].global_position.distance_to(players[j].global_position)
+			max_distance = max(max_distance, d)
+
+	# Adjust zoom by moving the camera along its back-facing direction
+	var base_offset := Vector3(0, 0.0, 15.0)  # Y = height, Z = depth
+	var zoom_multiplier: float = clamp(max_distance * 0.1, 0.0, 5.0)
+	var offset: Vector3 = base_offset + Vector3(0, 0, zoom_multiplier)
+
+	# Rotate the offset to match the isometric angle	
+	var rotated_offset := global_transform.basis * offset
+
+	# Move camera to new position
+	var desired_pos := avg_pos + rotated_offset
+	global_position = global_position.lerp(desired_pos, 0.1)
