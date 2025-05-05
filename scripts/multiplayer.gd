@@ -27,7 +27,9 @@ func _on_client_pressed():
 	# Start client
 	var ip_input = $ServerMenu/ItemList/ip.text
 	if ip_input == "":
-		OS.alert("Please enter a server IP to connect to.")
+		# UNDO THIS
+		ip_input = "127.0.0.1"
+		# OS.alert("Please enter a server IP to connect to.")
 
 	var peer = ENetMultiplayerPeer.new()
 	peer.create_client(ip_input, PORT)
