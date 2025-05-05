@@ -33,9 +33,11 @@ var is_wall_running = false
 var wall_run_timer = 100.0
 var wall_normal = Vector3.ZERO
 
-func _enter_tree() -> void:
-	# Set the player global value when this node is instantiated
+func _ready() -> void:
 	Global.player = self
+	Global.emit_signal("player_spawned", self)
+
+func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
 
 	print("name: ", name)

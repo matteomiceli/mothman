@@ -14,6 +14,14 @@ config/name="tag"
 run/main_scene="uid://dboxwdqtj17nc"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
+[autoload]
+
+Global="*res://scripts/global.gd"
+
+[editor]
+
+version_control/autoload_on_startup=true
+
 [global_group]
 
 walls=""

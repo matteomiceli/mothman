@@ -1,5 +1,4 @@
-class_name Global extends Node
+extends Node
 
-
-# Global player so camera can track their movement
-static var player: CharacterBody3D
+signal player_spawned(player: Node3D)
+var player: Node3D = null
