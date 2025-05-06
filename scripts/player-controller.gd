@@ -34,13 +34,8 @@ var wall_run_timer = 100.0
 var wall_normal = Vector3.ZERO
 
 func _ready() -> void:
-	if get_multiplayer_authority() == multiplayer.get_unique_id():
-		Global.player = self
-		Global.emit_signal("player_spawned", self)
-	else:
-		set_process(false)
-	anim_tree.active = true    # make sure anim tree is on everywhere
-	
+	Global.player = self
+	Global.emit_signal("player_spawned", self)
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
