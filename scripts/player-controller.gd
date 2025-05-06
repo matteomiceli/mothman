@@ -10,8 +10,8 @@ const PLAYER_GRAVITY := Vector3(0, -20, 0)
 
 # Animations
 const BLEND_SPEED := 15
-enum {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
-var currAnim := IDLE
+enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
+@export var currAnim: int = AnimState.IDLE
 var run_val: float = 0.0
 var dash_val: float = 0.0
 var wallrun_val: float = 0.0
@@ -34,8 +34,13 @@ var wall_run_timer = 100.0
 var wall_normal = Vector3.ZERO
 
 func _ready() -> void:
-	Global.player = self
-	Global.emit_signal("player_spawned", self)
+	if get_multiplayer_authority() == multiplayer.get_unique_id():
+		Global.player = self
+		Global.emit_signal("player_spawned", self)
+	else:
+		set_process(false)
+	anim_tree.active = true    # make sure anim tree is on everywhere
+	
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
@@ -46,14 +51,14 @@ func _enter_tree() -> void:
 	print("---")
 
 func _physics_process(delta: float):
-	if not is_multiplayer_authority(): return
-	apply_gravity(delta)
-	handle_movement(delta)
-	handle_wall_run(delta)
 	handle_animations(delta)
-	handle_dash_cooldown(delta)
-	detect_wall_run()
-	move_and_slide()
+	if is_multiplayer_authority():
+		apply_gravity(delta)
+		handle_movement(delta)
+		handle_wall_run(delta)
+		handle_dash_cooldown(delta)
+		detect_wall_run()
+		move_and_slide()
 
 func _on_body_entered(body):
 	if not is_on_floor() and not is_wall_running:
@@ -71,7 +76,7 @@ func apply_gravity(delta: float):
 				"parameters/fire_jump/request",
 				AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FADE_OUT
 			)
-			currAnim = FALL
+			currAnim = AnimState.FALL
 
 
 func detect_wall_run():
@@ -108,9 +113,9 @@ func handle_movement(delta: float):
 
 	if is_on_floor():
 		if velocity.is_zero_approx():
-			currAnim = IDLE
+			currAnim = AnimState.IDLE
 		else:
-			currAnim = RUN
+			currAnim = AnimState.RUN
 
 	if Input.is_action_just_pressed("jump"):
 		if is_on_floor() or is_wall_running:
@@ -158,7 +163,7 @@ func handle_wall_run(delta: float):
 func start_wall_run(new_wall_normal: Vector3):
 	if not is_wall_running:
 		is_wall_running = true
-		currAnim = WALL_RUN
+		currAnim = AnimState.WALL_RUN
 		wall_run_timer = WALL_RUN_DURATION
 		wall_normal = new_wall_normal
 		velocity.y = 0 # Cancel downward fall instantly
@@ -174,15 +179,15 @@ func handle_animations(delta: float):
 	var fall_target := 0.0
 
 	match currAnim:
-		IDLE:
+		AnimState.IDLE:
 			run_target = 0.0
-		RUN:
+		AnimState.RUN:
 			run_target = 1.0
-		DASH:
+		AnimState.DASH:
 			dash_target = 1.0
-		WALL_RUN:
+		AnimState.WALL_RUN:
 			wallrun_target = 1.0
-		FALL:
+		AnimState.FALL:
 			fall_target = 1.0
 
 	# Smooth blending
@@ -197,7 +202,7 @@ func handle_animations(delta: float):
 	update_animation_blend_values()
 
 func fire_jump_animation():
-	currAnim = JUMP
+	currAnim = AnimState.JUMP
 	# TODO: Eventually replace this system with FSM
 	anim_tree.set(
 		"parameters/fire_jump/request",
