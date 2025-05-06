@@ -2,6 +2,9 @@ extends Node3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if Global.game_mode == Global.MODE.SINGLEPLAYER:
+		add_player(1)
+
 	if multiplayer.is_server():
 		setup_multiplayer()
 
