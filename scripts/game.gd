@@ -8,5 +8,5 @@ func _on_singleplayer_pressed():
 
 func _on_multiplayer_pressed():
 	Global.game_mode = Global.MODE.MULTIPLAYER
-	$Mode.add_child(preload("res://scenes/Multiplayer.tscn").instantiate())
+	$Mode.add_child(preload("res://scenes/multiplayer.tscn").instantiate())
 	$Menu.hide()

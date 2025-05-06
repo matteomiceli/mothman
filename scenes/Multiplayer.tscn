@@ -1,7 +1,38 @@
-[gd_scene load_steps=3 format=3 uid="uid://dvek0nhlil3d0"]
+[gd_scene load_steps=7 format=3 uid="uid://dvek0nhlil3d0"]
 
 [ext_resource type="PackedScene" uid="uid://c05byuu4pif4x" path="res://scenes/world.tscn" id="1_t1ser"]
 [ext_resource type="Script" uid="uid://g30vtoijtak" path="res://scripts/multiplayer.gd" id="2_8fwmw"]
+[ext_resource type="Texture2D" uid="uid://dgyfyyr2mce8a" path="res://assets/space-sky.png" id="3_pjkx2"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_4vwpp"]
+panorama = ExtResource("3_pjkx2")
+energy_multiplier = 42.75
+
+[sub_resource type="Sky" id="Sky_36d77"]
+sky_material = SubResource("PanoramaSkyMaterial_4vwpp")
+process_mode = 1
+
+[sub_resource type="Environment" id="Environment_crvko"]
+background_mode = 2
+background_energy_multiplier = 0.0
+sky = SubResource("Sky_36d77")
+sky_custom_fov = 54.5
+ambient_light_energy = 12.89
+ssr_max_steps = 1
+ssr_fade_in = 1.00908
+ssr_fade_out = 5.09824
+ssao_enabled = true
+ssao_radius = 8.76
+ssao_power = 25.7226
+glow_enabled = true
+glow_levels/2 = 2.35
+glow_levels/3 = 10.91
+glow_levels/4 = 8.13
+glow_levels/5 = 5.25
+glow_levels/6 = 2.19
+glow_levels/7 = 2.06
+glow_intensity = 2.15
+glow_strength = 0.87
 
 [node name="Multiplayer" type="Node"]
 script = ExtResource("2_8fwmw")
@@ -63,6 +94,9 @@ offset_top = 318.0
 offset_right = 374.0
 offset_bottom = 359.0
 text = "Connect"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_crvko")
 
 [connection signal="pressed" from="ServerMenu/ItemList/host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="ServerMenu/ItemList/client_connect" to="." method="_on_client_pressed"]
