@@ -12,7 +12,7 @@ func _ready() -> void:
 func _on_player_spawned(player: Node3D) -> void:
 	if not players.has(player):
 		players.append(player)
-	
+
 func _physics_process(_delta: float) -> void:
 	if players.is_empty():
 		return
@@ -35,7 +35,7 @@ func _physics_process(_delta: float) -> void:
 	var zoom_multiplier: float = clamp(max_distance * 0.1, 0.0, 5.0)
 	var offset: Vector3 = base_offset + Vector3(0, 0, zoom_multiplier)
 
-	# Rotate the offset to match the isometric angle	
+	# Rotate the offset to match the isometric angle
 	var rotated_offset := global_transform.basis * offset
 
 	# Move camera to new position

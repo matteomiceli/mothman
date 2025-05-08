@@ -115,7 +115,7 @@ func handle_movement(delta: float):
 	if Input.is_action_just_pressed("jump"):
 		if is_on_floor() or is_wall_running:
 			velocity.y = JUMP_VELOCITY
-			fire_jump_animation()
+			fire_jump_animation.rpc()
 
 			if is_wall_running:
 				stop_wall_run()
@@ -196,6 +196,7 @@ func handle_animations(delta: float):
 
 	update_animation_blend_values()
 
+@rpc("call_local")
 func fire_jump_animation():
 	currAnim = AnimState.JUMP
 	# TODO: Eventually replace this system with FSM

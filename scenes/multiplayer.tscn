@@ -1,11 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://dvek0nhlil3d0"]
 
-[ext_resource type="PackedScene" uid="uid://c05byuu4pif4x" path="res://scenes/world.tscn" id="1_t1ser"]
-[ext_resource type="Script" uid="uid://g30vtoijtak" path="res://scripts/multiplayer.gd" id="2_8fwmw"]
-[ext_resource type="Texture2D" uid="uid://dgyfyyr2mce8a" path="res://assets/space-sky.png" id="3_pjkx2"]
+[ext_resource type="Script" uid="uid://g30vtoijtak" path="res://scripts/multiplayer.gd" id="1_pjkx2"]
+[ext_resource type="PackedScene" uid="uid://c05byuu4pif4x" path="res://scenes/world.tscn" id="2_4vwpp"]
+[ext_resource type="Texture2D" uid="uid://dgyfyyr2mce8a" path="res://assets/space-sky.png" id="3_36d77"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_4vwpp"]
-panorama = ExtResource("3_pjkx2")
+panorama = ExtResource("3_36d77")
 energy_multiplier = 42.75
 
 [sub_resource type="Sky" id="Sky_36d77"]
@@ -35,9 +35,9 @@ glow_intensity = 2.15
 glow_strength = 0.87
 
 [node name="Multiplayer" type="Node"]
-script = ExtResource("2_8fwmw")
+script = ExtResource("1_pjkx2")
 
-[node name="World" parent="." instance=ExtResource("1_t1ser")]
+[node name="World" parent="." instance=ExtResource("2_4vwpp")]
 
 [node name="ServerMenu" type="Control" parent="."]
 process_mode = 3
