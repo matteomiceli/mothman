@@ -36,6 +36,17 @@ var wall_normal = Vector3.ZERO
 var can_wall_run = true
 var can_wall_jump = true
 
+# Bar Swing
+var is_swinging: bool = false
+var swing_anchor: Node3D = null
+var swing_angle: float = 0.0
+var swing_speed: float = 0.0
+var swing_radius: float = 2.0
+var swing_plane_normal: Vector3
+var swing_binormal: Vector3
+const SWING_GRAVITY = -10.0
+const SWING_ACCEL = 2.5
+
 func _ready() -> void:
 	Global.player = self
 	Global.emit_signal("player_spawned", self)
@@ -50,13 +61,25 @@ func _enter_tree() -> void:
 
 func _physics_process(delta: float):
 	handle_animations(delta)
+
 	if is_multiplayer_authority():
-		apply_gravity(delta)
-		handle_movement(delta)
-		handle_wall_run(delta)
-		handle_dash_cooldown(delta)
-		detect_wall_run()
-		move_and_slide()
+		handle_swing_input()
+		if not is_swinging:
+			apply_gravity(delta)
+			handle_movement(delta)
+			handle_wall_run(delta)
+			handle_dash_cooldown(delta)
+			detect_wall_run()
+			move_and_slide()
+		else:
+			handle_swing(delta)
+			
+func _on_body_entered(body):
+	if not is_on_floor() and not is_wall_running:
+		if body.is_in_group("walls"): # ← Make sure walls are tagged as "walls"
+			var collision = get_last_slide_collision()
+			if collision:
+				start_wall_run(collision.normal)
 
 func apply_gravity(delta: float):
 	if not is_on_floor() and not is_wall_running:
@@ -83,6 +106,9 @@ func detect_wall_run():
 		stop_wall_run()
 
 func handle_movement(delta: float):
+	if is_swinging:
+		return
+
 	var input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
 	var input_velocity := Vector3(input_dir.x * MOVE_SPEED, 0, input_dir.y * MOVE_SPEED)
 
@@ -131,6 +157,12 @@ func handle_movement(delta: float):
 			dash_cooldown_timer = DASH_COOLDOWN
 			dash_velocity = Vector3(input_dir.x, 0, input_dir.y) * DASH_FORCE
 
+func handle_swing_input():
+	if Input.is_action_just_pressed("grab") and not is_swinging and swing_anchor:
+		start_swing()
+	elif Input.is_action_just_released("grab") and is_swinging:
+		release_swing()
+
 func handle_dash_decay(delta: float):
 	if not is_dashing:
 		return
@@ -170,6 +202,47 @@ func start_wall_run(new_wall_normal: Vector3):
 func stop_wall_run():
 	is_wall_running = false
 	wall_normal = Vector3.ZERO
+
+func handle_swing(delta: float):
+	swing_speed += -sin(swing_angle) * SWING_ACCEL * delta
+	swing_speed *= 0.99
+	swing_angle += swing_speed * delta
+
+	# New position = rotated offset in dynamic swing plane
+	var local_offset = cos(swing_angle) * (global_position - swing_anchor.global_position).normalized() * swing_radius \
+					 + sin(swing_angle) * swing_binormal * swing_radius
+
+	global_position = swing_anchor.global_position + local_offset
+
+	look_at(swing_anchor.global_position, Vector3.UP)
+	rotate_y(PI)
+
+func set_swing_anchor(anchor: Node3D):
+	swing_anchor = anchor
+
+func start_swing():
+	print("Swing anchor:", swing_anchor)
+
+	is_swinging = true
+	currAnim = AnimState.IDLE  # Or use AnimState.SWING if defined
+
+	# Step 1: define swing frame
+	var anchor_to_player = (global_position - swing_anchor.global_position).normalized()
+	swing_plane_normal = anchor_to_player.cross(velocity).normalized()
+	swing_binormal = swing_plane_normal.cross(anchor_to_player).normalized()
+	swing_radius = (global_position - swing_anchor.global_position).length()
+
+	# Step 2: convert velocity to angular speed
+	# We'll treat swing_angle as a scalar for rotation progress, not a global angle
+	var tangential_dir = swing_binormal  # direction player moves around the anchor
+	swing_speed = velocity.dot(tangential_dir) / swing_radius
+	swing_angle = 0.0  # starting at current position
+
+func release_swing():
+	is_swinging = false
+	
+	var release_velocity = swing_binormal * swing_speed * swing_radius
+	velocity = release_velocity
 
 func handle_animations(delta: float):
 	var run_target := 0.0
@@ -214,3 +287,8 @@ func update_animation_blend_values():
 	anim_tree.set("parameters/to_dash/blend_amount", dash_val)
 	anim_tree.set("parameters/to_wallrun/blend_amount", wallrun_val)
 	anim_tree.set("parameters/to_falling/blend_amount", falling_val)
+
+func _process(delta):
+	if is_swinging:
+		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_binormal * 2.0, Color.RED)
+		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_plane_normal * 2.0, Color.BLUE)
