@@ -27,11 +27,14 @@ const DASH_COOLDOWN := 1
 var dash_cooldown_timer: float = 2.0
 
 # Wall Run
-const WALL_RUN_DURATION = 100 # seconds
-const WALL_RUN_GRAVITY = -1.0 # slightly push into wall
+const WALL_RUN_DURATION = 0.8 # seconds
+const WALL_RUN_GRAVITY = -5
 var is_wall_running = false
-var wall_run_timer = 100.0
+var wall_run_timer = 0.8
 var wall_normal = Vector3.ZERO
+# Vars to enforce wall jump and wall run once
+var can_wall_run = true
+var can_wall_jump = true
 
 func _ready() -> void:
 	Global.player = self
@@ -55,13 +58,6 @@ func _physics_process(delta: float):
 		detect_wall_run()
 		move_and_slide()
 
-func _on_body_entered(body):
-	if not is_on_floor() and not is_wall_running:
-		if body.is_in_group("walls"): # ← Make sure walls are tagged as "walls"
-			var collision = get_last_slide_collision()
-			if collision:
-				start_wall_run(collision.normal)
-
 func apply_gravity(delta: float):
 	if not is_on_floor() and not is_wall_running:
 		velocity += PLAYER_GRAVITY * delta
@@ -73,15 +69,18 @@ func apply_gravity(delta: float):
 			)
 			currAnim = AnimState.FALL
 
-
 func detect_wall_run():
-	if not is_on_floor() and not is_wall_running:
+	if is_on_floor():
+		return
+
+	if is_on_wall() and not is_wall_running:
 		for i in range(get_slide_collision_count()):
 			var collision = get_slide_collision(i)
 			if collision.get_collider().is_in_group("walls"):
-				print("Wall detected:", collision.get_collider().name)
 				start_wall_run(collision.get_normal())
 				break
+	else:
+		stop_wall_run()
 
 func handle_movement(delta: float):
 	var input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
@@ -107,6 +106,11 @@ func handle_movement(delta: float):
 	rotation.y = lerp_angle(rotation.y, target_rotation_y, 10.0 * delta)
 
 	if is_on_floor():
+		if not can_wall_run:
+			can_wall_run = true
+			can_wall_jump = true
+
+		# Animation
 		if velocity.is_zero_approx():
 			currAnim = AnimState.IDLE
 		else:
@@ -118,6 +122,7 @@ func handle_movement(delta: float):
 			fire_jump_animation.rpc()
 
 			if is_wall_running:
+				can_wall_jump = false
 				stop_wall_run()
 
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
@@ -150,7 +155,7 @@ func handle_dash_cooldown(delta: float):
 func handle_wall_run(delta: float):
 	if is_wall_running:
 		wall_run_timer -= delta
-		velocity.y = WALL_RUN_GRAVITY
+		velocity.y += WALL_RUN_GRAVITY * delta
 
 		if wall_run_timer <= 0.0 or is_on_floor():
 			stop_wall_run()
@@ -161,7 +166,6 @@ func start_wall_run(new_wall_normal: Vector3):
 		currAnim = AnimState.WALL_RUN
 		wall_run_timer = WALL_RUN_DURATION
 		wall_normal = new_wall_normal
-		velocity.y = 0 # Cancel downward fall instantly
 
 func stop_wall_run():
 	is_wall_running = false
