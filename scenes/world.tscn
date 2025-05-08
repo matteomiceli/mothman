@@ -21,7 +21,7 @@ spawn_path = NodePath("../PlayersSpawn")
 spawn_limit = 4
 
 [node name="Bar" parent="." instance=ExtResource("3_qfnet")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.00454, 3.20084, 0)
+transform = Transform3D(-0.0152362, 0, -0.999884, 0, 1, 0, 0.999884, 0, -0.0152362, -0.0112033, 2.74617, 2.76311)
 
 [node name="Wall" parent="." instance=ExtResource("5_71j4m")]
 transform = Transform3D(-0.00301033, -0.125865, -0.937738, 0.00630595, 4.45224, -0.0265263, 1.01385, -0.0280657, -0.00261934, -2.53878, -3.64279, 3.03084)

@@ -162,7 +162,6 @@ func handle_swing_input():
 	if Input.is_action_just_pressed("grab") and not is_swinging and swing_anchor:
 		start_swing()
 	elif Input.is_action_just_released("grab") and is_swinging:
-		swing_anchor = null
 		release_swing()
 
 func handle_dash_decay(delta: float):
@@ -250,8 +249,10 @@ func release_swing():
 	is_swinging = false
 
 	# Apply launch velocity from swing arc
-	var release_velocity = swing_binormal * swing_speed * swing_radius
-	velocity = release_velocity
+	# Position vector from anchor to character at release
+	var radial = (global_position - swing_anchor.global_position).normalized()
+	var tangent = swing_plane_normal.cross(radial).normalized()
+	velocity = tangent * swing_speed * swing_radius
 
 	# Reset orientation
 	rotation.x = 0.0
@@ -261,6 +262,8 @@ func release_swing():
 	if velocity.length() > 0.1:
 		var flat_velocity = Vector3(velocity.x, 0, velocity.z).normalized()
 		rotation.y = atan2(-flat_velocity.x, -flat_velocity.z)
+	
+	swing_anchor = null
 
 func handle_animations(delta: float):
 	var run_target := 0.0
