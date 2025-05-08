@@ -161,6 +161,7 @@ func handle_swing_input():
 	if Input.is_action_just_pressed("grab") and not is_swinging and swing_anchor:
 		start_swing()
 	elif Input.is_action_just_released("grab") and is_swinging:
+		swing_anchor = null
 		release_swing()
 
 func handle_dash_decay(delta: float):
