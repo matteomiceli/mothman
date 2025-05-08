@@ -44,6 +44,7 @@ var swing_speed: float = 0.0
 var swing_radius: float = 2.0
 var swing_plane_normal: Vector3
 var swing_binormal: Vector3
+var swing_base_vector: Vector3
 const SWING_GRAVITY = -10.0
 const SWING_ACCEL = 2.5
 
@@ -205,45 +206,61 @@ func stop_wall_run():
 	wall_normal = Vector3.ZERO
 
 func handle_swing(delta: float):
-	swing_speed += -sin(swing_angle) * SWING_ACCEL * delta
-	swing_speed *= 0.99
+	# Apply swing torque from gravity (simplified)
+	var torque = -SWING_ACCEL * sin(swing_angle)
+	swing_speed += torque * delta
+	swing_speed *= 0.995  # Damping
 	swing_angle += swing_speed * delta
 
-	# New position = rotated offset in dynamic swing plane
-	var local_offset = cos(swing_angle) * (global_position - swing_anchor.global_position).normalized() * swing_radius \
-					 + sin(swing_angle) * swing_binormal * swing_radius
+	# Rotate the base vector around the swing plane normal
+	var rotated_vector = swing_base_vector.rotated(swing_plane_normal, swing_angle)
+	global_position = swing_anchor.global_position + rotated_vector * swing_radius
 
-	global_position = swing_anchor.global_position + local_offset
+	# Keep the player upright and optionally look forward
+	rotation.x = 0
+	rotation.z = 0
 
-	look_at(swing_anchor.global_position, Vector3.UP)
-	rotate_y(PI)
+	var look_dir = rotated_vector.cross(swing_plane_normal).normalized()
+	rotation.y = atan2(-look_dir.x, -look_dir.z)
 
 func set_swing_anchor(anchor: Node3D):
 	swing_anchor = anchor
 
 func start_swing():
-	print("Swing anchor:", swing_anchor)
-
 	is_swinging = true
-	currAnim = AnimState.IDLE  # Or use AnimState.SWING if defined
+	currAnim = AnimState.IDLE
 
-	# Step 1: define swing frame
-	var anchor_to_player = (global_position - swing_anchor.global_position).normalized()
-	swing_plane_normal = anchor_to_player.cross(velocity).normalized()
-	swing_binormal = swing_plane_normal.cross(anchor_to_player).normalized()
+	# Calculate swing base vector (direction from anchor to player)
+	swing_base_vector = (global_position - swing_anchor.global_position).normalized()
 	swing_radius = (global_position - swing_anchor.global_position).length()
 
-	# Step 2: convert velocity to angular speed
-	# We'll treat swing_angle as a scalar for rotation progress, not a global angle
-	var tangential_dir = swing_binormal  # direction player moves around the anchor
-	swing_speed = velocity.dot(tangential_dir) / swing_radius
-	swing_angle = 0.0  # starting at current position
+	# Use player velocity to get the swing plane
+	swing_plane_normal = swing_base_vector.cross(velocity).normalized()
+	swing_binormal = swing_plane_normal.cross(swing_base_vector).normalized()
+	var swing_forward = swing_binormal.normalized()
+
+	# Determine angle from current offset
+	swing_angle = 0.0
+
+	# Project player velocity onto swing tangent to get angular speed
+	var tangent_velocity = velocity.dot(swing_forward)
+	swing_speed = tangent_velocity / swing_radius
 
 func release_swing():
 	is_swinging = false
-	
+
+	# Apply launch velocity from swing arc
 	var release_velocity = swing_binormal * swing_speed * swing_radius
 	velocity = release_velocity
+
+	# Reset orientation
+	rotation.x = 0.0
+	rotation.z = 0.0
+
+	# Optional: turn to face movement direction
+	if velocity.length() > 0.1:
+		var flat_velocity = Vector3(velocity.x, 0, velocity.z).normalized()
+		rotation.y = atan2(-flat_velocity.x, -flat_velocity.z)
 
 func handle_animations(delta: float):
 	var run_target := 0.0
