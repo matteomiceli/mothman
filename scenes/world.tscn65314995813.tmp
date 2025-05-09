@@ -1,0 +1,56 @@
+[gd_scene load_steps=7 format=3 uid="uid://c05byuu4pif4x"]
+
+[ext_resource type="Script" uid="uid://b2tk02yely8by" path="res://scripts/world.gd" id="1_qfnet"]
+[ext_resource type="PackedScene" uid="uid://6s1mmgwdx7un" path="res://scenes/floor.tscn" id="1_rwgxs"]
+[ext_resource type="Script" uid="uid://c10xmvg2cs3yh" path="res://scripts/camera_3d.gd" id="3_4wyf3"]
+[ext_resource type="PackedScene" uid="uid://cby1gh4t28jlq" path="res://scenes/box.tscn" id="3_k0juu"]
+[ext_resource type="PackedScene" uid="uid://34ggt478yj3t" path="res://scenes/bar.tscn" id="3_qfnet"]
+[ext_resource type="PackedScene" uid="uid://b8aoy26couqrv" path="res://scenes/wall.tscn" id="5_71j4m"]
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_qfnet")
+
+[node name="Floor" parent="." instance=ExtResource("1_rwgxs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="PlayersSpawn" type="Node3D" parent="."]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://c17h2tuj0i08t")
+spawn_path = NodePath("../PlayersSpawn")
+spawn_limit = 4
+
+[node name="Bar" parent="." instance=ExtResource("3_qfnet")]
+transform = Transform3D(-0.0152362, 0, -0.999884, 0, 1, 0, 0.999884, 0, -0.0152362, -0.0112033, 2.74617, 2.76311)
+
+[node name="Wall" parent="." instance=ExtResource("5_71j4m")]
+transform = Transform3D(-0.00301033, -0.125865, -0.937738, 0.00630595, 4.45224, -0.0265263, 1.01385, -0.0280657, -0.00261934, -2.53878, -3.64279, 3.03084)
+
+[node name="Box1" parent="." instance=ExtResource("3_k0juu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 8.10172)
+
+[node name="Box2" parent="." instance=ExtResource("3_k0juu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.110913, 10.1043)
+
+[node name="Box3" parent="." instance=ExtResource("3_k0juu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.79391)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.997549, 0.0658961, 0.0235181, -0.0570181, 0.570821, 0.819093, 0.0405504, -0.818426, 0.573179, 0, 15.5293, 4.87762)
+light_energy = 1.635
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.797542, 0.603263, 0, -0.603263, 0.797542, -0.0660871, 20.2415, 42.5806)
+fov = 50.6
+script = ExtResource("3_4wyf3")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="DashCooldownBar" type="ProgressBar" parent="CanvasLayer"]
+custom_minimum_size = Vector2(11, 11)
+offset_right = 200.0
+offset_bottom = 27.0
+scale = Vector2(2, 2)
+size_flags_horizontal = 3
+max_value = 1.0
