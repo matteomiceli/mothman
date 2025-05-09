@@ -29,6 +29,10 @@ enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
 # =====================
 # ==  STATE VARIABLES ==
 # =====================
+
+# Crouch
+var is_crouching := false
+const CROUCH_SPEED_MULTIPLIER := 0.5
 @export var currAnim: int = AnimState.IDLE
 var run_val := 0.0
 var dash_val := 0.0
@@ -88,10 +92,15 @@ func _physics_process(delta):
 			handle_dash_cooldown(delta)
 			move_and_slide()
 
-# =====================`6
+# =====================
 # ==  INPUT HANDLING ==
 # =====================
 func handle_inputs():
+	if Input.is_action_pressed("crouch"):
+		is_crouching = true
+	else:
+		is_crouching = false
+
 	if Input.is_action_just_pressed("jump"):
 		try_jump()
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
@@ -110,7 +119,6 @@ func try_jump():
 		velocity.y = JUMP_VELOCITY
 		fire_jump_animation.rpc()
 	elif is_wall_running:
-		can_wall_run = false
 		stop_wall_run()
 		# Clean upward jump with slight push away from the wall
 		var jump_impulse = Vector3.UP + wall_normal * 0.5
@@ -187,7 +195,8 @@ func apply_gravity(delta):
 # =====================
 func handle_movement(delta):
 	var input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
-	var input_velocity = Vector3(input_dir.x, 0, input_dir.y) * MOVE_SPEED
+	var speed = MOVE_SPEED * (CROUCH_SPEED_MULTIPLIER if is_crouching else 1.0)
+	var input_velocity = Vector3(input_dir.x, 0, input_dir.y) * speed
 	var target_velocity = input_velocity + dash_velocity
 	velocity.x = move_toward(velocity.x, target_velocity.x, ACCELERATION * delta)
 	velocity.z = move_toward(velocity.z, target_velocity.z, ACCELERATION * delta)

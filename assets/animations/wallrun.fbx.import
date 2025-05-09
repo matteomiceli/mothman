@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://kyi8ynvyll4o"
-path="res://.godot/imported/wallrun.fbx-f37333f8de16887406e978d263ca36b2.scn"
+path="res://.godot/imported/wallrun.fbx-bdfa12397237a51f0da87083c59bfc17.scn"
 
 [deps]
 
-source_file="res://assets/wallrun.fbx"
-dest_files=["res://.godot/imported/wallrun.fbx-f37333f8de16887406e978d263ca36b2.scn"]
+source_file="res://assets/animations/wallrun.fbx"
+dest_files=["res://.godot/imported/wallrun.fbx-bdfa12397237a51f0da87083c59bfc17.scn"]
 
 [params]
 
