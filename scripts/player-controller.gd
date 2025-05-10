@@ -65,6 +65,7 @@ func _ready():
 	Global.emit_signal("player_spawned", self)
 
 func _physics_process(delta):
+	#print(is_wall_running) # debug
 	handle_inputs()
 	handle_animations(delta)
 
