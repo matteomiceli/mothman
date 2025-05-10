@@ -61,6 +61,7 @@ var swing_radius := 2.0
 var swing_plane_normal := Vector3.ZERO
 var swing_binormal := Vector3.ZERO
 var swing_base_vector := Vector3.ZERO
+var swing_offset_from_anchor := Vector3.ZERO
 
 # =====================
 # ==  INITIALIZATION ==
@@ -96,11 +97,7 @@ func _physics_process(delta):
 # ==  INPUT HANDLING ==
 # =====================
 func handle_inputs():
-	if Input.is_action_pressed("crouch"):
-		is_crouching = true
-	else:
-		is_crouching = false
-
+	is_crouching = Input.is_action_pressed("crouch")
 	if Input.is_action_just_pressed("jump"):
 		try_jump()
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
@@ -120,9 +117,7 @@ func try_jump():
 		fire_jump_animation.rpc()
 	elif is_wall_running:
 		stop_wall_run()
-		# Clean upward jump with slight push away from the wall
-		var jump_impulse = Vector3.UP + wall_normal * 0.5
-		velocity = jump_impulse.normalized() * JUMP_VELOCITY
+		velocity = (Vector3.UP + wall_normal * 0.5).normalized() * JUMP_VELOCITY
 		fire_jump_animation.rpc()
 
 # =====================
@@ -201,7 +196,6 @@ func handle_movement(delta):
 	velocity.x = move_toward(velocity.x, target_velocity.x, ACCELERATION * delta)
 	velocity.z = move_toward(velocity.z, target_velocity.z, ACCELERATION * delta)
 
-	# Rotate to face move direction
 	if input_dir.length() > 0.1:
 		target_rotation_y = atan2(-input_dir.x, -input_dir.y)
 		rotation.y = lerp_angle(rotation.y, target_rotation_y, 10.0 * delta)
@@ -218,9 +212,11 @@ func handle_movement(delta):
 func start_swing():
 	is_swinging = true
 	currAnim = AnimState.IDLE
-	swing_base_vector = (global_position - swing_anchor.global_position).normalized()
-	swing_radius = (global_position - swing_anchor.global_position).length()
-	swing_plane_normal = swing_base_vector.cross(velocity).normalized()
+
+	swing_offset_from_anchor = global_position - swing_anchor.global_position
+	swing_base_vector = swing_offset_from_anchor.normalized()
+	swing_radius = swing_offset_from_anchor.length()
+	swing_plane_normal = swing_base_vector.cross(Vector3.FORWARD).normalized()
 	swing_binormal = swing_plane_normal.cross(swing_base_vector).normalized()
 	var swing_forward = swing_binormal.normalized()
 	swing_angle = 0.0
@@ -231,11 +227,11 @@ func handle_swing(delta):
 	swing_speed += torque * delta
 	swing_speed *= 0.995
 	swing_angle += swing_speed * delta
+
 	var rotated = swing_base_vector.rotated(swing_plane_normal, swing_angle)
 	global_position = swing_anchor.global_position + rotated * swing_radius
 	rotation.x = 0
 	rotation.z = 0
-	rotation.y = atan2(-rotated.cross(swing_plane_normal).x, -rotated.cross(swing_plane_normal).z)
 
 func release_swing():
 	if swing_anchor == null:
