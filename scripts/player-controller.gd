@@ -5,24 +5,26 @@ extends CharacterBody3D
 @onready var anim_tree = $PlayerModel/AnimationTree
 @onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/CanvasLayer/DashCooldownBar")
 
-enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
+enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN, CROUCH}
 
-# General
+# Player
 const MOVE_SPEED := 6
 const ACCELERATION := 90
 const JUMP_VELOCITY := 8
 const PLAYER_GRAVITY := Vector3(0, -20, 0)
-const SWING_ACCEL := 2.5
-const BLEND_SPEED := 15
+var target_rotation_y := 0.0
 
-# Crouch
-const CROUCH_SPEED_MULTIPLIER := 0.5
-var is_crouching := false
+# Animations
+const BLEND_SPEED := 15
+var crouch_val := 0.0
 var run_val := 0.0
 var dash_val := 0.0
 var wallrun_val := 0.0
 var falling_val := 0.0
-var target_rotation_y := 0.0
+
+# Crouch
+const CROUCH_SPEED_MULTIPLIER := 0.5
+var is_crouching := false
 
 # Dash
 const DASH_FORCE := 40
@@ -42,6 +44,7 @@ var can_wall_run := true
 var can_wall_jump := true
 
 # Swing
+const SWING_ACCEL := 2.5
 var is_swinging := false
 var swing_anchor: Node3D = null
 var swing_angle := 0.0
@@ -79,6 +82,8 @@ func _physics_process(delta):
 
 func handle_inputs():
 	is_crouching = Input.is_action_pressed("crouch")
+	if is_crouching:
+		currAnim = AnimState.CROUCH
 	if Input.is_action_just_pressed("jump"):
 		try_jump()
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
@@ -217,15 +222,18 @@ func set_swing_anchor(anchor: Node3D):
 	swing_anchor = anchor
 
 func handle_animations(delta):
+	var crouch_t := 0.0
 	var run_t := 0.0
 	var dash_t := 0.0
 	var wall_t := 0.0
 	var fall_t := 0.0
 	match currAnim:
+		AnimState.CROUCH: crouch_t = 1.0
 		AnimState.RUN: run_t = 1.0
 		AnimState.DASH: dash_t = 1.0
 		AnimState.WALL_RUN: wall_t = 1.0
 		AnimState.FALL: fall_t = 1.0
+	crouch_val = lerpf(crouch_val, crouch_t, delta * BLEND_SPEED)
 	run_val = lerpf(run_val, run_t, delta * BLEND_SPEED)
 	dash_val = lerpf(dash_val, dash_t, delta * BLEND_SPEED)
 	wallrun_val = lerpf(wallrun_val, wall_t, delta * BLEND_SPEED)
@@ -238,6 +246,7 @@ func fire_jump_animation():
 	anim_tree.set("parameters/fire_jump/request", AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FIRE)
 
 func update_animation_blend_values():
+	anim_tree.set("parameters/to_crouch/blend_amount", crouch_val)
 	anim_tree.set("parameters/to_run/blend_amount", run_val)
 	anim_tree.set("parameters/to_dash/blend_amount", dash_val)
 	anim_tree.set("parameters/to_wallrun/blend_amount", wallrun_val)
