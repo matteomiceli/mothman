@@ -1,11 +1,15 @@
 extends CharacterBody3D
 
 @export var currAnim: int = AnimState.IDLE
-
+@export var footstep_sounds: Array[AudioStream] = []
+		
 @onready var anim_tree = $PlayerModel/AnimationTree
 @onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
 
-enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN, CROUCH}
+
+# Audio
+const FOOTSTEP_INTERVAL := 0.4  # seconds between steps
+var footstep_timer := 0.0
 
 # Player
 const MOVE_SPEED := 6
@@ -16,6 +20,7 @@ var target_rotation_y := 0.0
 
 # Animations
 const BLEND_SPEED := 15
+enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN, CROUCH}
 var crouch_val := 0.0
 var run_val := 0.0
 var dash_val := 0.0
@@ -79,6 +84,7 @@ func _physics_process(delta):
 			handle_dash_decay(delta)
 			detect_wall_run()
 			handle_wall_run(delta)
+			handle_footsteps(delta)
 			move_and_slide()
 
 func handle_inputs():
@@ -124,6 +130,15 @@ func handle_dash_cooldown(delta):
 	if dash_bar:
 		dash_bar.value = DASH_COOLDOWN - dash_cooldown_timer
 
+func handle_footsteps(delta):
+	if is_on_floor() and velocity.length() > 1.0:
+		footstep_timer -= delta
+		if footstep_timer <= 0:
+			play_footstep()
+			footstep_timer = FOOTSTEP_INTERVAL
+	else:
+		footstep_timer = 0.0  # reset when airborne or idle
+	
 func detect_wall_run():
 	if is_on_floor(): return
 	if is_on_wall() and is_wall_running: return
@@ -252,6 +267,12 @@ func update_animation_blend_values():
 	anim_tree.set("parameters/to_dash/blend_amount", dash_val)
 	anim_tree.set("parameters/to_wallrun/blend_amount", wallrun_val)
 	anim_tree.set("parameters/to_falling/blend_amount", falling_val)
+
+func play_footstep():
+	if footstep_sounds.size() > 0:
+		var sound = footstep_sounds[randi() % footstep_sounds.size()]
+		$FootstepPlayer.stream = sound
+		$FootstepPlayer.play()
 
 # =====================
 # ======  DEBUG =======
