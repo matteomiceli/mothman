@@ -101,7 +101,7 @@ func try_jump():
 		fire_jump_animation.rpc()
 	elif is_wall_running and can_wall_jump:
 		can_wall_jump = false
-		#stop_wall_run()
+		stop_wall_run()
 		velocity = (Vector3.UP + wall_normal * 0.5).normalized() * JUMP_VELOCITY
 		fire_jump_animation.rpc()
 
@@ -130,7 +130,7 @@ func detect_wall_run():
 	if is_on_wall() and not is_wall_running:
 		for i in get_slide_collision_count():
 			var col = get_slide_collision(i)
-			if col.get_collider().is_in_group("walls"):
+			if col.get_collider().is_in_group("walls") and sign(velocity.y) != -1:
 				start_wall_run(col.get_normal())
 				break
 	else:
