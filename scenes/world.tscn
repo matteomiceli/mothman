@@ -1,11 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://c05byuu4pif4x"]
+[gd_scene load_steps=9 format=3 uid="uid://c05byuu4pif4x"]
 
 [ext_resource type="Script" uid="uid://b2tk02yely8by" path="res://scripts/world.gd" id="1_qfnet"]
 [ext_resource type="PackedScene" uid="uid://6s1mmgwdx7un" path="res://scenes/floor.tscn" id="1_rwgxs"]
-[ext_resource type="Script" uid="uid://c10xmvg2cs3yh" path="res://scripts/camera_3d.gd" id="3_4wyf3"]
+[ext_resource type="Script" uid="uid://c10xmvg2cs3yh" path="res://scripts/camera-3d.gd" id="3_4wyf3"]
 [ext_resource type="PackedScene" uid="uid://cby1gh4t28jlq" path="res://scenes/box.tscn" id="3_k0juu"]
 [ext_resource type="PackedScene" uid="uid://34ggt478yj3t" path="res://scenes/bar.tscn" id="3_qfnet"]
 [ext_resource type="PackedScene" uid="uid://b8aoy26couqrv" path="res://scenes/wall.tscn" id="5_71j4m"]
+[ext_resource type="Script" uid="uid://bmmrue78fxehb" path="res://scripts/canvas-layer.gd" id="7_i7141"]
+[ext_resource type="FontFile" uid="uid://bsbglbevsg75j" path="res://assets/fonts/Orbitron-Regular.ttf" id="8_4mrxx"]
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_qfnet")
@@ -45,9 +47,30 @@ transform = Transform3D(1, 0, 0, 0, 0.797542, 0.603263, 0, -0.603263, 0.797542, 
 fov = 50.6
 script = ExtResource("3_4wyf3")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CountdownLayer" type="CanvasLayer" parent="."]
+process_mode = 3
+script = ExtResource("7_i7141")
 
-[node name="DashCooldownBar" type="ProgressBar" parent="CanvasLayer"]
+[node name="CountdownLabel" type="Label" parent="CountdownLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("8_4mrxx")
+theme_override_font_sizes/font_size = 500
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DashCooldownLayer" type="CanvasLayer" parent="."]
+
+[node name="DashCooldownBar" type="ProgressBar" parent="DashCooldownLayer"]
 custom_minimum_size = Vector2(11, 11)
 offset_right = 200.0
 offset_bottom = 27.0

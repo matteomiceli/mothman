@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://c77rhvx3lsc65"]
+[gd_scene load_steps=2 format=3 uid="uid://d3ayp8mm6klf1"]
 
 [ext_resource type="PackedScene" uid="uid://by0r17j3nkmx5" path="res://assets/animations/crouch-walk.fbx" id="1_mm3vg"]
 

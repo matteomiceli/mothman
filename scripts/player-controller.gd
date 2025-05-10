@@ -3,7 +3,7 @@ extends CharacterBody3D
 @export var currAnim: int = AnimState.IDLE
 
 @onready var anim_tree = $PlayerModel/AnimationTree
-@onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/CanvasLayer/DashCooldownBar")
+@onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
 
 enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN, CROUCH}
 
@@ -32,7 +32,7 @@ const DASH_DECAY := 200
 const DASH_COOLDOWN := 1
 var is_dashing := false
 var dash_velocity := Vector3.ZERO
-var dash_cooldown_timer := 2.0
+var dash_cooldown_timer := 0.0
 
 # Wall Run
 const WALL_RUN_DURATION := 0.8 # seconds

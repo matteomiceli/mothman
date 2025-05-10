@@ -1,6 +1,7 @@
 extends Node
 
 signal player_spawned(player: Node3D)
+signal countdown_finished()
 var player: Node3D = null
 
 enum MODE {MULTIPLAYER, SINGLEPLAYER, NULL}

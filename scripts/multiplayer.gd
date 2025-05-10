@@ -3,9 +3,10 @@ extends Node
 const PORT = 4433
 
 func _ready() -> void:
+	Global.countdown_finished.connect(_on_countdown_finished)
+	
 	# Pause game
 	get_tree().paused = true
-
 	multiplayer.server_relay = false
 
 	# Start the server in headless mode.
@@ -24,7 +25,6 @@ func _on_host_pressed():
 	
 	# Add server host player to game
 	$World.add_player(1)
-	start_game()
 
 func _on_client_pressed():
 	# Start client
@@ -40,6 +40,8 @@ func _on_client_pressed():
 		OS.alert("Failed to connect to client")
 		return
 	multiplayer.multiplayer_peer = peer
+
+func _on_countdown_finished():
 	start_game()
 
 func start_game():
