@@ -1,39 +1,23 @@
 extends CharacterBody3D
 
-# =====================
-# ==  NODE REFERENCES ==
-# =====================
+@export var currAnim: int = AnimState.IDLE
+
 @onready var anim_tree = $PlayerModel/AnimationTree
 @onready var dash_bar = get_tree().get_root().get_node("World/CanvasLayer/DashCooldownBar")
 
-# ===================
-# ==  CONSTANTS     ==
-# ===================
+enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
+
+# General
 const MOVE_SPEED := 6
 const ACCELERATION := 90
 const JUMP_VELOCITY := 8
 const PLAYER_GRAVITY := Vector3(0, -20, 0)
-const DASH_FORCE := 40
-const DASH_DECAY := 200
-const DASH_COOLDOWN := 1
-const WALL_RUN_DURATION := 0.8
-const WALL_RUN_GRAVITY := -5
 const SWING_ACCEL := 2.5
 const BLEND_SPEED := 15
 
-# ====================
-# ==  ENUMS         ==
-# ====================
-enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
-
-# =====================
-# ==  STATE VARIABLES ==
-# =====================
-
 # Crouch
-var is_crouching := false
 const CROUCH_SPEED_MULTIPLIER := 0.5
-@export var currAnim: int = AnimState.IDLE
+var is_crouching := false
 var run_val := 0.0
 var dash_val := 0.0
 var wallrun_val := 0.0
@@ -41,13 +25,18 @@ var falling_val := 0.0
 var target_rotation_y := 0.0
 
 # Dash
+const DASH_FORCE := 40
+const DASH_DECAY := 200
+const DASH_COOLDOWN := 1
 var is_dashing := false
 var dash_velocity := Vector3.ZERO
 var dash_cooldown_timer := 2.0
 
 # Wall Run
+const WALL_RUN_DURATION := 0.8 # seconds
+const WALL_RUN_GRAVITY := -5
 var is_wall_running := false
-var wall_run_timer := 0.0
+var wall_run_timer := 0.8
 var wall_normal := Vector3.ZERO
 var can_wall_run := true
 var can_wall_jump := true
@@ -63,9 +52,6 @@ var swing_binormal := Vector3.ZERO
 var swing_base_vector := Vector3.ZERO
 var swing_offset_from_anchor := Vector3.ZERO
 
-# =====================
-# ==  INITIALIZATION ==
-# =====================
 func _ready():
 	Global.player = self
 	Global.emit_signal("player_spawned", self)
@@ -74,9 +60,6 @@ func _enter_tree():
 	set_multiplayer_authority(name.to_int())
 	print("name:", name, " id:", multiplayer.get_unique_id(), " auth:", get_multiplayer_authority())
 
-# =====================
-# ==  MAIN PHYSICS   ==
-# =====================
 func _physics_process(delta):
 	handle_inputs()
 	handle_animations(delta)
@@ -88,14 +71,11 @@ func _physics_process(delta):
 			apply_gravity(delta)
 			handle_movement(delta)
 			handle_dash_decay(delta)
-			handle_wall_run(delta)
 			detect_wall_run()
+			handle_wall_run(delta)
 			handle_dash_cooldown(delta)
 			move_and_slide()
 
-# =====================
-# ==  INPUT HANDLING ==
-# =====================
 func handle_inputs():
 	is_crouching = Input.is_action_pressed("crouch")
 	if Input.is_action_just_pressed("jump"):
@@ -107,9 +87,6 @@ func handle_inputs():
 	elif Input.is_action_just_released("grab") and is_swinging:
 		release_swing()
 
-# =====================
-# ==  JUMPING        ==
-# =====================
 func try_jump():
 	if is_on_floor():
 		can_wall_run = true
@@ -120,9 +97,6 @@ func try_jump():
 		velocity = (Vector3.UP + wall_normal * 0.5).normalized() * JUMP_VELOCITY
 		fire_jump_animation.rpc()
 
-# =====================
-# ==  DASHING        ==
-# =====================
 func start_dash():
 	is_dashing = true
 	dash_cooldown_timer = DASH_COOLDOWN
@@ -142,9 +116,6 @@ func handle_dash_cooldown(delta):
 	if dash_bar:
 		dash_bar.value = DASH_COOLDOWN - dash_cooldown_timer
 
-# =====================
-# ==  WALL RUN       ==
-# =====================
 func detect_wall_run():
 	if is_on_floor(): return
 	if is_on_wall() and not is_wall_running:
@@ -171,13 +142,10 @@ func stop_wall_run():
 func handle_wall_run(delta):
 	if is_wall_running:
 		wall_run_timer -= delta
-		velocity.y = 0.0
+		velocity.y += WALL_RUN_GRAVITY * delta
 		if wall_run_timer <= 0.0 or is_on_floor():
 			stop_wall_run()
 
-# =====================
-# ==  GRAVITY        ==
-# =====================
 func apply_gravity(delta):
 	if not is_on_floor() and not is_wall_running:
 		velocity += PLAYER_GRAVITY * delta
@@ -185,9 +153,6 @@ func apply_gravity(delta):
 			currAnim = AnimState.FALL
 			anim_tree.set("parameters/fire_jump/request", AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FADE_OUT)
 
-# =====================
-# ==  MOVEMENT       ==
-# =====================
 func handle_movement(delta):
 	var input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
 	var speed = MOVE_SPEED * (CROUCH_SPEED_MULTIPLIER if is_crouching else 1.0)
@@ -206,9 +171,6 @@ func handle_movement(delta):
 			can_wall_jump = true
 		currAnim = AnimState.IDLE if velocity.is_zero_approx() else AnimState.RUN
 
-# =====================
-# ==  SWINGING        ==
-# =====================
 func start_swing():
 	is_swinging = true
 	currAnim = AnimState.IDLE
@@ -250,9 +212,6 @@ func release_swing():
 func set_swing_anchor(anchor: Node3D):
 	swing_anchor = anchor
 
-# =====================
-# ==  ANIMATIONS     ==
-# =====================
 func handle_animations(delta):
 	var run_t := 0.0
 	var dash_t := 0.0
@@ -281,7 +240,7 @@ func update_animation_blend_values():
 	anim_tree.set("parameters/to_falling/blend_amount", falling_val)
 
 # =====================
-# ==  DEBUG DRAWING  ==
+# ======  DEBUG =======
 # =====================
 func _process(delta):
 	if is_swinging and swing_anchor:
