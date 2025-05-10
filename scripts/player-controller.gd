@@ -8,7 +8,7 @@ extends CharacterBody3D
 
 
 # Audio
-const FOOTSTEP_INTERVAL := 0.4  # seconds between steps
+const FOOTSTEP_INTERVAL := 0.35  # seconds between steps
 var footstep_timer := 0.0
 
 # Player
@@ -49,6 +49,7 @@ var can_wall_run := true
 var can_wall_jump := true
 
 # Swing
+const FIXED_SWING_RADIUS := 2.0 
 const SWING_ACCEL := 2.5
 var is_swinging := false
 var swing_anchor: Node3D = null
@@ -59,6 +60,11 @@ var swing_plane_normal := Vector3.ZERO
 var swing_binormal := Vector3.ZERO
 var swing_base_vector := Vector3.ZERO
 var swing_offset_from_anchor := Vector3.ZERO
+var snap_start_pos: Vector3
+var snap_target_pos: Vector3
+var snap_time := 0.0
+var snap_duration := 0.15
+var is_snapping := false
 
 func _enter_tree():
 	#print_full_tree() # debug
@@ -76,7 +82,9 @@ func _physics_process(delta):
 
 	if is_multiplayer_authority():
 		handle_dash_cooldown(delta)
-		if is_swinging:
+		if is_snapping:
+			handle_snap(delta)
+		elif is_swinging:
 			handle_swing(delta)
 		else:
 			apply_gravity(delta)
@@ -86,6 +94,13 @@ func _physics_process(delta):
 			handle_wall_run(delta)
 			handle_footsteps(delta)
 			move_and_slide()
+
+func handle_snap(delta):
+	snap_time += delta
+	var t = clamp(snap_time / snap_duration, 0.0, 1.0)
+	global_position = snap_start_pos.lerp(snap_target_pos, t)
+	if t >= 1.0:
+		is_snapping = false
 
 func handle_inputs():
 	is_crouching = Input.is_action_pressed("crouch")
@@ -131,7 +146,7 @@ func handle_dash_cooldown(delta):
 		dash_bar.value = DASH_COOLDOWN - dash_cooldown_timer
 
 func handle_footsteps(delta):
-	if is_on_floor() and velocity.length() > 1.0:
+	if (is_on_floor() or is_wall_running) and velocity.length() > 1.0:
 		footstep_timer -= delta
 		if footstep_timer <= 0:
 			play_footstep()
@@ -200,14 +215,27 @@ func start_swing():
 	is_swinging = true
 	currAnim = AnimState.IDLE
 
-	swing_offset_from_anchor = global_position - swing_anchor.global_position
+	var offset = global_position - swing_anchor.global_position
+	var bar_axis = Vector3(1, 0, 0)
+	var x_offset = bar_axis * offset.dot(bar_axis)
+	var radial = (offset - x_offset).normalized() * FIXED_SWING_RADIUS
+	var snapped_offset = x_offset + radial  # <- local scope
+
+	swing_offset_from_anchor = snapped_offset
+	swing_radius = FIXED_SWING_RADIUS
 	swing_base_vector = swing_offset_from_anchor.normalized()
-	swing_radius = swing_offset_from_anchor.length()
-	swing_plane_normal = swing_base_vector.cross(Vector3.FORWARD).normalized()
+	swing_plane_normal = bar_axis
 	swing_binormal = swing_plane_normal.cross(swing_base_vector).normalized()
+
 	var swing_forward = swing_binormal.normalized()
 	swing_angle = 0.0
 	swing_speed = velocity.dot(swing_forward) / swing_radius
+
+	# Setup snapping
+	snap_start_pos = global_position
+	snap_target_pos = swing_anchor.global_position + snapped_offset
+	snap_time = 0.0
+	is_snapping = true
 
 func handle_swing(delta):
 	var torque = -SWING_ACCEL * sin(swing_angle)
@@ -217,8 +245,10 @@ func handle_swing(delta):
 
 	var rotated = swing_base_vector.rotated(swing_plane_normal, swing_angle)
 	global_position = swing_anchor.global_position + rotated * swing_radius
+
 	rotation.x = 0
 	rotation.z = 0
+
 
 func release_swing():
 	if swing_anchor == null:
