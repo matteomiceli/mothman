@@ -70,6 +70,7 @@ func _physics_process(delta):
 	handle_animations(delta)
 
 	if is_multiplayer_authority():
+		handle_dash_cooldown(delta)
 		if is_swinging:
 			handle_swing(delta)
 		else:
@@ -78,7 +79,6 @@ func _physics_process(delta):
 			handle_dash_decay(delta)
 			detect_wall_run()
 			handle_wall_run(delta)
-			handle_dash_cooldown(delta)
 			move_and_slide()
 
 func handle_inputs():
