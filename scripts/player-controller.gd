@@ -3,7 +3,7 @@ extends CharacterBody3D
 @export var currAnim: int = AnimState.IDLE
 
 @onready var anim_tree = $PlayerModel/AnimationTree
-@onready var dash_bar = get_tree().get_root().get_node("World/CanvasLayer/DashCooldownBar")
+@onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/CanvasLayer/DashCooldownBar")
 
 enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN}
 
@@ -34,7 +34,7 @@ var dash_cooldown_timer := 2.0
 
 # Wall Run
 const WALL_RUN_DURATION := 0.8 # seconds
-const WALL_RUN_GRAVITY := -5
+const WALL_RUN_GRAVITY := -7
 var is_wall_running := false
 var wall_run_timer := 0.8
 var wall_normal := Vector3.ZERO
@@ -46,19 +46,20 @@ var is_swinging := false
 var swing_anchor: Node3D = null
 var swing_angle := 0.0
 var swing_speed := 0.0
-var swing_radius := 2.0
+var swing_radius := 1112.0
 var swing_plane_normal := Vector3.ZERO
 var swing_binormal := Vector3.ZERO
 var swing_base_vector := Vector3.ZERO
 var swing_offset_from_anchor := Vector3.ZERO
 
+func _enter_tree():
+	#print_full_tree() # debug
+	set_multiplayer_authority(name.to_int())
+	print("name:", name, " id:", multiplayer.get_unique_id(), " auth:", get_multiplayer_authority())
+
 func _ready():
 	Global.player = self
 	Global.emit_signal("player_spawned", self)
-
-func _enter_tree():
-	set_multiplayer_authority(name.to_int())
-	print("name:", name, " id:", multiplayer.get_unique_id(), " auth:", get_multiplayer_authority())
 
 func _physics_process(delta):
 	handle_inputs()
@@ -89,11 +90,12 @@ func handle_inputs():
 
 func try_jump():
 	if is_on_floor():
-		can_wall_run = true
+		can_wall_jump = true
 		velocity.y = JUMP_VELOCITY
 		fire_jump_animation.rpc()
-	elif is_wall_running:
-		stop_wall_run()
+	elif is_wall_running and can_wall_jump:
+		can_wall_jump = false
+		#stop_wall_run()
 		velocity = (Vector3.UP + wall_normal * 0.5).normalized() * JUMP_VELOCITY
 		fire_jump_animation.rpc()
 
@@ -118,6 +120,7 @@ func handle_dash_cooldown(delta):
 
 func detect_wall_run():
 	if is_on_floor(): return
+	if is_on_wall() and is_wall_running: return
 	if is_on_wall() and not is_wall_running:
 		for i in get_slide_collision_count():
 			var col = get_slide_collision(i)
@@ -161,15 +164,16 @@ func handle_movement(delta):
 	velocity.x = move_toward(velocity.x, target_velocity.x, ACCELERATION * delta)
 	velocity.z = move_toward(velocity.z, target_velocity.z, ACCELERATION * delta)
 
+	# rotation
 	if input_dir.length() > 0.1:
 		target_rotation_y = atan2(-input_dir.x, -input_dir.y)
 		rotation.y = lerp_angle(rotation.y, target_rotation_y, 10.0 * delta)
 
 	if is_on_floor():
+		currAnim = AnimState.IDLE if velocity.is_zero_approx() else AnimState.RUN
 		if not can_wall_run:
 			can_wall_run = true
 			can_wall_jump = true
-		currAnim = AnimState.IDLE if velocity.is_zero_approx() else AnimState.RUN
 
 func start_swing():
 	is_swinging = true
@@ -246,3 +250,15 @@ func _process(delta):
 	if is_swinging and swing_anchor:
 		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_binormal * 2.0, Color.RED)
 		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_plane_normal * 2.0, Color.BLUE)
+
+func print_full_tree():
+	var root = get_tree().root
+	_print_tree_recursive(root, 0)
+
+func _print_tree_recursive(node: Node, indent: int):
+	var padding = ""
+	for i in range(indent):
+		padding += "  "
+	print(padding + node.name + " (" + node.get_class() + ")")
+	for child in node.get_children():
+		_print_tree_recursive(child, indent + 1)
