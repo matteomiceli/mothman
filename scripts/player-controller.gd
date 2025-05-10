@@ -8,7 +8,7 @@ extends CharacterBody3D
 
 
 # Audio
-const FOOTSTEP_INTERVAL := 0.35  # seconds between steps
+const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
 var footstep_timer := 0.0
 
 # Player
@@ -20,7 +20,7 @@ var target_rotation_y := 0.0
 
 # Animations
 const BLEND_SPEED := 15
-enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN, CROUCH}
+enum AnimState {IDLE, RUN, JUMP, FALL, DASH, WALL_RUN, CROUCH, HANGING}
 var crouch_val := 0.0
 var run_val := 0.0
 var dash_val := 0.0
@@ -49,7 +49,7 @@ var can_wall_run := true
 var can_wall_jump := true
 
 # Swing
-const FIXED_SWING_RADIUS := 2.0 
+const FIXED_SWING_RADIUS := 2.0
 const SWING_ACCEL := 2.5
 var is_swinging := false
 var swing_anchor: Node3D = null
@@ -65,6 +65,7 @@ var snap_target_pos: Vector3
 var snap_time := 0.0
 var snap_duration := 0.15
 var is_snapping := false
+var hanging_val := 0.0
 
 func _enter_tree():
 	#print_full_tree() # debug
@@ -152,7 +153,7 @@ func handle_footsteps(delta):
 			play_footstep()
 			footstep_timer = FOOTSTEP_INTERVAL
 	else:
-		footstep_timer = 0.0  # reset when airborne or idle
+		footstep_timer = 0.0 # reset when airborne or idle
 	
 func detect_wall_run():
 	if is_on_floor(): return
@@ -219,7 +220,7 @@ func start_swing():
 	var bar_axis = Vector3(1, 0, 0)
 	var x_offset = bar_axis * offset.dot(bar_axis)
 	var radial = (offset - x_offset).normalized() * FIXED_SWING_RADIUS
-	var snapped_offset = x_offset + radial  # <- local scope
+	var snapped_offset = x_offset + radial # <- local scope
 
 	swing_offset_from_anchor = snapped_offset
 	swing_radius = FIXED_SWING_RADIUS
@@ -238,7 +239,7 @@ func start_swing():
 	is_snapping = true
 
 func handle_swing(delta):
-	var torque = -SWING_ACCEL * sin(swing_angle)
+	var torque = - SWING_ACCEL * sin(swing_angle)
 	swing_speed += torque * delta
 	swing_speed *= 0.995
 	swing_angle += swing_speed * delta
@@ -248,6 +249,7 @@ func handle_swing(delta):
 
 	rotation.x = 0
 	rotation.z = 0
+	currAnim = AnimState.HANGING
 
 
 func release_swing():
@@ -269,16 +271,19 @@ func set_swing_anchor(anchor: Node3D):
 
 func handle_animations(delta):
 	var crouch_t := 0.0
+	var hanging_t := 0.0
 	var run_t := 0.0
 	var dash_t := 0.0
 	var wall_t := 0.0
 	var fall_t := 0.0
 	match currAnim:
 		AnimState.CROUCH: crouch_t = 1.0
+		AnimState.HANGING: hanging_t = 1.0
 		AnimState.RUN: run_t = 1.0
 		AnimState.DASH: dash_t = 1.0
 		AnimState.WALL_RUN: wall_t = 1.0
 		AnimState.FALL: fall_t = 1.0
+	hanging_val = lerpf(hanging_val, hanging_t, delta * BLEND_SPEED)
 	crouch_val = lerpf(crouch_val, crouch_t, delta * BLEND_SPEED)
 	run_val = lerpf(run_val, run_t, delta * BLEND_SPEED)
 	dash_val = lerpf(dash_val, dash_t, delta * BLEND_SPEED)
@@ -293,6 +298,7 @@ func fire_jump_animation():
 
 func update_animation_blend_values():
 	anim_tree.set("parameters/to_crouch/blend_amount", crouch_val)
+	anim_tree.set("parameters/to_hanging/blend_amount", hanging_val)
 	anim_tree.set("parameters/to_run/blend_amount", run_val)
 	anim_tree.set("parameters/to_dash/blend_amount", dash_val)
 	anim_tree.set("parameters/to_wallrun/blend_amount", wallrun_val)
