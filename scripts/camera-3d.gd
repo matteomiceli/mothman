@@ -31,9 +31,9 @@ func _physics_process(_delta: float) -> void:
 			max_distance = max(max_distance, d)
 
 	# Adjust zoom by moving the camera along its back-facing direction
-	var base_offset := Vector3(0, 0.0, 15.0)  # Y = height, Z = depth
-	var zoom_multiplier: float = clamp(max_distance * 0.1, 0.0, 5.0)
-	var offset: Vector3 = base_offset + Vector3(0, 0, zoom_multiplier)
+	var base_offset := Vector3(0.0, 0.0, 15.0)  # Y = height, Z = depth
+	var zoom_multiplier: float = clamp(max_distance * 1.2, 5.0, 25.0)
+	var offset: Vector3 = base_offset + Vector3(0.0, 0.0, zoom_multiplier)
 
 	# Rotate the offset to match the isometric angle
 	var rotated_offset := global_transform.basis * offset

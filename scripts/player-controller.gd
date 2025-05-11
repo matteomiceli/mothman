@@ -47,6 +47,7 @@ var wall_run_timer := 0.8
 var wall_normal := Vector3.ZERO
 var can_wall_run := true
 var can_wall_jump := true
+var last_wall_id := 0
 
 # Swing
 const FIXED_SWING_RADIUS := 2.0
@@ -163,6 +164,9 @@ func detect_wall_run():
 			var col = get_slide_collision(i)
 			if col.get_collider().is_in_group("walls") and sign(velocity.y) != -1:
 				start_wall_run(col.get_normal())
+				if (col.get_collider().get_instance_id() != last_wall_id):
+					can_wall_jump = true
+				last_wall_id = col.get_collider().get_instance_id()
 				break
 	else:
 		stop_wall_run()

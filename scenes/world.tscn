@@ -25,7 +25,13 @@ spawn_limit = 4
 [node name="Bar" parent="." instance=ExtResource("3_qfnet")]
 transform = Transform3D(-0.0152362, 0, -0.999884, 0, 1, 0, 0.999884, 0, -0.0152362, -0.0112033, 2.74617, 2.76311)
 
-[node name="Wall" parent="." instance=ExtResource("5_71j4m")]
+[node name="WallBehindLeft" parent="." instance=ExtResource("5_71j4m")]
+transform = Transform3D(-0.00301033, -0.552044, -0.868345, 0.00630595, 19.5275, -0.0245634, 1.01385, -0.123096, -0.00242551, 10.5487, -28.1101, -1.97256)
+
+[node name="WallBehindRight" parent="." instance=ExtResource("5_71j4m")]
+transform = Transform3D(-0.00301033, -0.552044, -0.868345, 0.00630595, 19.5275, -0.0245634, 1.01385, -0.123096, -0.00242551, 12.7627, -27.5393, -1.97256)
+
+[node name="WallMain" parent="." instance=ExtResource("5_71j4m")]
 transform = Transform3D(-0.00301033, -0.125865, -0.937738, 0.00630595, 4.45224, -0.0265263, 1.01385, -0.0280657, -0.00261934, -2.53878, -3.64279, 3.03084)
 
 [node name="Box1" parent="." instance=ExtResource("3_k0juu")]
@@ -78,3 +84,4 @@ offset_bottom = 27.0
 scale = Vector2(2, 2)
 size_flags_horizontal = 3
 max_value = 1.0
+allow_greater = true
