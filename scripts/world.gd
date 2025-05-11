@@ -8,7 +8,6 @@ func _ready() -> void:
 	if multiplayer.is_server():
 		setup_multiplayer()
 
-
 func setup_multiplayer():
 	# Listen for peers connecting and disconnecting
 	multiplayer.peer_connected.connect(add_player)
@@ -26,10 +25,8 @@ func add_player(id: int):
 		# TODO - This positioning doesn't work yet - this forum thread might help
 		# https://forum.godotengine.org/t/setting-position-on-spawn-in-multiplayer-causes-client-to-spawn-at-0-0-0/78584/7
 		player.position.x += 10
-
-
+	
 	$PlayersSpawn.add_child(player, true)
-
 
 func remove_player(id: int):
 	print("remove", id)

@@ -49,6 +49,7 @@ script = ExtResource("3_4wyf3")
 
 [node name="CountdownLayer" type="CanvasLayer" parent="."]
 process_mode = 3
+visible = false
 script = ExtResource("7_i7141")
 
 [node name="CountdownLabel" type="Label" parent="CountdownLayer"]

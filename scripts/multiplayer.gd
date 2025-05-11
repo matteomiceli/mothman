@@ -25,7 +25,8 @@ func _on_host_pressed():
 	
 	# Add server host player to game
 	$World.add_player(1)
-
+	start_game()
+	
 func _on_client_pressed():
 	# Start client
 	var ip_input = $ServerMenu/ItemList/ip.text
@@ -40,6 +41,7 @@ func _on_client_pressed():
 		OS.alert("Failed to connect to client")
 		return
 	multiplayer.multiplayer_peer = peer
+	start_game()
 
 func _on_countdown_finished():
 	start_game()

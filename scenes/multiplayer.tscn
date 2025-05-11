@@ -2,13 +2,14 @@
 
 [ext_resource type="Script" uid="uid://g30vtoijtak" path="res://scripts/multiplayer.gd" id="1_pjkx2"]
 [ext_resource type="PackedScene" uid="uid://c05byuu4pif4x" path="res://scenes/world.tscn" id="2_4vwpp"]
-[ext_resource type="Texture2D" uid="uid://dgyfyyr2mce8a" path="res://assets/space-sky.png" id="3_36d77"]
+[ext_resource type="Texture2D" uid="uid://dgyfyyr2mce8a" path="res://assets/images/space-sky.png" id="3_36d77"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_4vwpp"]
 panorama = ExtResource("3_36d77")
 energy_multiplier = 42.75
 
 [sub_resource type="Sky" id="Sky_36d77"]
+resource_local_to_scene = true
 sky_material = SubResource("PanoramaSkyMaterial_4vwpp")
 process_mode = 1
 
@@ -16,7 +17,7 @@ process_mode = 1
 background_mode = 2
 background_energy_multiplier = 0.0
 sky = SubResource("Sky_36d77")
-sky_custom_fov = 54.5
+sky_custom_fov = 169.4
 ambient_light_energy = 12.89
 ssr_max_steps = 1
 ssr_fade_in = 1.00908
