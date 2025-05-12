@@ -61,12 +61,22 @@ offset_bottom = 164.0
 text = "Server shit:"
 vertical_alignment = 1
 
+[node name="Color" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 230.0
+offset_right = 161.0
+offset_bottom = 259.0
+text = "Color:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="or" type="Label" parent="ServerMenu/ItemList"]
 layout_mode = 0
 offset_left = 62.0
-offset_top = 277.0
+offset_top = 356.0
 offset_right = 160.0
-offset_bottom = 306.0
+offset_bottom = 385.0
 text = "or"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -74,43 +84,35 @@ vertical_alignment = 1
 [node name="ip" type="LineEdit" parent="ServerMenu/ItemList"]
 layout_mode = 0
 offset_left = 51.0
-offset_top = 318.0
+offset_top = 397.0
 offset_right = 248.0
-offset_bottom = 358.0
+offset_bottom = 437.0
 scale = Vector2(0.963334, 0.996)
 placeholder_text = "ip_address:port"
 
 [node name="host" type="Button" parent="ServerMenu/ItemList"]
 layout_mode = 0
 offset_left = 52.0
-offset_top = 219.0
+offset_top = 298.0
 offset_right = 172.0
-offset_bottom = 265.0
+offset_bottom = 344.0
 text = "Host"
 
-[node name="HostColorPicker" type="ColorPickerButton" parent="ServerMenu/ItemList"]
+[node name="PlayerColorPicker" type="ColorPickerButton" parent="ServerMenu/ItemList"]
 layout_mode = 0
-offset_left = 189.0
-offset_top = 219.0
-offset_right = 239.0
-offset_bottom = 265.0
+offset_left = 166.0
+offset_top = 221.0
+offset_right = 216.0
+offset_bottom = 267.0
 color = Color(0.385, 0.5005, 0.77, 1)
 
 [node name="client_connect" type="Button" parent="ServerMenu/ItemList"]
 layout_mode = 0
-offset_left = 341.0
-offset_top = 318.0
-offset_right = 461.0
-offset_bottom = 359.0
+offset_left = 270.0
+offset_top = 397.0
+offset_right = 390.0
+offset_bottom = 438.0
 text = "Connect"
-
-[node name="ClientColorPicker" type="ColorPickerButton" parent="ServerMenu/ItemList"]
-layout_mode = 0
-offset_left = 265.0
-offset_top = 315.0
-offset_right = 315.0
-offset_bottom = 361.0
-color = Color(0.75, 0.505, 0.33, 1)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_crvko")

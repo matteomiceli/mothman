@@ -13,7 +13,7 @@ const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
 var footstep_timer := 0.0
 
 # Customization
-var hoody_color: Color = Color(1,1,1)
+@export var hoody_color: Color = Color(1,1,1)
 
 # Player
 const MOVE_SPEED := 6
@@ -80,7 +80,7 @@ func _enter_tree():
 func _ready():
 	Global.player = self
 	Global.emit_signal("player_spawned", self)
-	set_character_customization()
+	apply_character_customization()
 
 func _physics_process(delta):
 	#print(is_wall_running) # debug
@@ -278,9 +278,8 @@ func release_swing():
 func set_swing_anchor(anchor: Node3D):
 	swing_anchor = anchor
 
-func set_character_customization():
+func apply_character_customization():
 	hoody_mesh.get_active_material(0).albedo_color = hoody_color
-	
 
 func handle_animations(delta):
 	var crouch_t := 0.0

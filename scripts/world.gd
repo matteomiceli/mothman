@@ -10,10 +10,10 @@ func _ready() -> void:
 		pass
 		add_player(1)
 
-func add_player(id: int):
+func add_player(id: int, color: Color = Color(1,1,1)):
 	var player = Player.instantiate()
-	print(player)
 	player.name = str(id)
+	player.hoody_color = color
 
 	if len(multiplayer.get_peers()) > 0:
 		# TODO - This positioning doesn't work yet - this forum thread might help

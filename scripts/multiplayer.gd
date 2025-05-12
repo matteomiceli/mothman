@@ -1,7 +1,6 @@
 extends Node
 
-@onready var host_color_picker = $ServerMenu/ItemList/HostColorPicker
-@onready var client_color_picker = $ServerMenu/ItemList/ClientColorPicker
+@onready var player_color_picker = $ServerMenu/ItemList/PlayerColorPicker
 @onready var world = $World
 
 const PORT = 4433
@@ -25,9 +24,17 @@ func start_server():
 func register_listeners():
 	if not multiplayer.is_server(): return
 
-	multiplayer.peer_connected.connect(world.add_player)
+	multiplayer.peer_connected.connect(add_player.rpc)
 	multiplayer.peer_disconnected.connect(world.remove_player)
 
+@rpc("authority", "call_local")
+func add_player(id):
+	# This peer's player
+	if id == multiplayer.get_unique_id():
+		world.add_player(id, player_color_picker.color)
+		return
+	
+	world.add_player(id)
 
 func _on_host_pressed():
 	# Start host
@@ -39,7 +46,7 @@ func _on_host_pressed():
 	multiplayer.multiplayer_peer = peer
 
 	# Add server host player
-	world.add_player(multiplayer.get_unique_id())
+	world.add_player(multiplayer.get_unique_id(), player_color_picker.color)
 	start_game()
 	
 func _on_client_pressed():
@@ -70,5 +77,5 @@ func _exit_tree() -> void:
 	# Cleanup listeners
 	if not multiplayer.is_server(): return 
 
-	multiplayer.peer_connected.disconnect(world.add_player)
+	multiplayer.peer_connected.disconnect(add_player.rpc)
 	multiplayer.peer_disconnected.disconnect(world.remove_player)
