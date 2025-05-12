@@ -88,13 +88,29 @@ offset_right = 172.0
 offset_bottom = 265.0
 text = "Host"
 
+[node name="HostColorPicker" type="ColorPickerButton" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 189.0
+offset_top = 219.0
+offset_right = 239.0
+offset_bottom = 265.0
+color = Color(0.385, 0.5005, 0.77, 1)
+
 [node name="client_connect" type="Button" parent="ServerMenu/ItemList"]
 layout_mode = 0
-offset_left = 254.0
+offset_left = 341.0
 offset_top = 318.0
-offset_right = 374.0
+offset_right = 461.0
 offset_bottom = 359.0
 text = "Connect"
+
+[node name="ClientColorPicker" type="ColorPickerButton" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 265.0
+offset_top = 315.0
+offset_right = 315.0
+offset_bottom = 361.0
+color = Color(0.75, 0.505, 0.33, 1)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_crvko")
