@@ -5,11 +5,15 @@ extends CharacterBody3D
 		
 @onready var anim_tree = $PlayerModel/AnimationTree
 @onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
+@onready var hoody_mesh: MeshInstance3D = $PlayerModel/Armature/Skeleton3D/Hoody
 
 
 # Audio
 const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
 var footstep_timer := 0.0
+
+# Customization
+@export var hoody_color: Color = Color(1,1,1)
 
 # Player
 const MOVE_SPEED := 6
@@ -76,6 +80,7 @@ func _enter_tree():
 func _ready():
 	Global.player = self
 	Global.emit_signal("player_spawned", self)
+	apply_character_customization()
 
 func _physics_process(delta):
 	#print(is_wall_running) # debug
@@ -273,6 +278,9 @@ func release_swing():
 func set_swing_anchor(anchor: Node3D):
 	swing_anchor = anchor
 
+func apply_character_customization():
+	hoody_mesh.get_active_material(0).albedo_color = hoody_color
+
 func handle_animations(delta):
 	var crouch_t := 0.0
 	var hanging_t := 0.0
@@ -317,7 +325,7 @@ func play_footstep():
 # =====================
 # ======  DEBUG =======
 # =====================
-func _process(delta):
+func _process(_delta):
 	if is_swinging and swing_anchor:
 		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_binormal * 2.0, Color.RED)
 		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_plane_normal * 2.0, Color.BLUE)
