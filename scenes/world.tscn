@@ -74,14 +74,3 @@ theme_override_fonts/font = ExtResource("8_4mrxx")
 theme_override_font_sizes/font_size = 500
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="DashCooldownLayer" type="CanvasLayer" parent="."]
-
-[node name="DashCooldownBar" type="ProgressBar" parent="DashCooldownLayer"]
-custom_minimum_size = Vector2(11, 11)
-offset_right = 200.0
-offset_bottom = 27.0
-scale = Vector2(2, 2)
-size_flags_horizontal = 3
-max_value = 1.0
-allow_greater = true
