@@ -10,16 +10,17 @@ func _ready() -> void:
 		pass
 		add_player(1)
 
-func add_player(id: int, color: Color = Color(1,1,1)):
+func add_player(id: int, color: Color = Color(1, 1, 1)):
 	var player = Player.instantiate()
 	player.name = str(id)
 	player.hoody_color = color
+	print("INSIDE ADD PLAYER")
 
 	if len(multiplayer.get_peers()) > 0:
 		# TODO - This positioning doesn't work yet - this forum thread might help
 		# https://forum.godotengine.org/t/setting-position-on-spawn-in-multiplayer-causes-client-to-spawn-at-0-0-0/78584/7
-		player.position.x += 10
-	
+		pass
+		#player.position.x += 10
 	player_spawner.add_child(player, true)
 
 func remove_player(id: int):

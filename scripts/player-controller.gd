@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 @export var currAnim: int = AnimState.IDLE
 @export var footstep_sounds: Array[AudioStream] = []
-		
+
 @onready var anim_tree = $PlayerModel/AnimationTree
 @onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
 @onready var hoody_mesh: MeshInstance3D = $PlayerModel/Armature/Skeleton3D/Hoody
@@ -13,7 +13,7 @@ const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
 var footstep_timer := 0.0
 
 # Customization
-@export var hoody_color: Color = Color(1,1,1)
+@export var hoody_color: Color = Color(1, 1, 1)
 
 # Player
 const MOVE_SPEED := 6
@@ -160,7 +160,7 @@ func handle_footsteps(delta):
 			footstep_timer = FOOTSTEP_INTERVAL
 	else:
 		footstep_timer = 0.0 # reset when airborne or idle
-	
+
 func detect_wall_run():
 	if is_on_floor(): return
 	if is_on_wall() and is_wall_running: return
@@ -279,7 +279,8 @@ func set_swing_anchor(anchor: Node3D):
 	swing_anchor = anchor
 
 func apply_character_customization():
-	hoody_mesh.get_active_material(0).albedo_color = hoody_color
+	if hoody_mesh: # ensure it's not null (not yet instantiated)
+		hoody_mesh.get_active_material(0).albedo_color = hoody_color
 
 func handle_animations(delta):
 	var crouch_t := 0.0

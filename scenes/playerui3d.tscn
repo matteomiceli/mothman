@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://dfu8tny8db0vh"]
+[gd_scene load_steps=0 format=3 uid="uid://dfu8tny8db0vh"]
 
 [node name="PlayerUI3D" type="SubViewport"]
 disable_3d = true
