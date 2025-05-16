@@ -14,7 +14,6 @@ func add_player(id: int, color: Color = Color(1, 1, 1)):
 	var player = Player.instantiate()
 	player.name = str(id)
 	player.hoody_color = color
-	print("INSIDE ADD PLAYER")
 
 	if len(multiplayer.get_peers()) > 0:
 		# TODO - This positioning doesn't work yet - this forum thread might help

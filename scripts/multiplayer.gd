@@ -39,7 +39,9 @@ func register_player(id: int, color: Color):
 @rpc("authority", "call_local")
 func add_player(id):
 	if is_multiplayer_authority():
-		var player_color = players.get(id, player_color_picker.color)
+		var player_color = players.get(id, Color.WHITE)
+		print(">>> add id: ", id)
+		print(">>> color: ", player_color)
 		world.add_player(id, player_color)
 
 func _on_host_pressed():

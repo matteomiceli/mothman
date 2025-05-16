@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cby1gh4t28jlq" path="res://scenes/box.tscn" id="3_k0juu"]
 [ext_resource type="PackedScene" uid="uid://34ggt478yj3t" path="res://scenes/bar.tscn" id="3_qfnet"]
 [ext_resource type="PackedScene" uid="uid://b8aoy26couqrv" path="res://scenes/wall.tscn" id="5_71j4m"]
-[ext_resource type="Script" path="res://scripts/canvas-layer.gd" id="7_i7141"]
+[ext_resource type="Script" uid="uid://bmmrue78fxehb" path="res://scripts/canvas-layer.gd" id="7_i7141"]
 [ext_resource type="FontFile" uid="uid://bsbglbevsg75j" path="res://assets/fonts/Orbitron-Regular.ttf" id="8_4mrxx"]
 
 [node name="World" type="Node3D"]
