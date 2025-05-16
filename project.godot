@@ -11,12 +11,16 @@ config_version=5
 [application]
 
 config/name="tag"
-run/main_scene="uid://dboxwdqtj17nc"
+run/main_scene="uid://b8xdr5adrprlp"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
 [autoload]
 
 Global="*res://scripts/global.gd"
+
+[debug]
+
+file_logging/enable_file_logging=true
 
 [editor]
 

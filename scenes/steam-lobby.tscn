@@ -1,0 +1,177 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8xdr5adrprlp"]
+
+[ext_resource type="Script" uid="uid://wdtu2oqpwdfy" path="res://scripts/steam-lobby.gd" id="1_e0ibk"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_e0ibk")
+
+[node name="Players" type="Panel" parent="."]
+offset_left = 13.0
+offset_top = 157.0
+offset_right = 306.0
+offset_bottom = 547.0
+
+[node name="Label" type="Label" parent="Players"]
+layout_mode = 0
+offset_left = 69.0
+offset_top = 4.0
+offset_right = 149.0
+offset_bottom = 27.0
+scale = Vector2(1.91864, 1.85392)
+text = "Players (0)"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Players"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 54.0
+offset_right = 287.0
+offset_bottom = 374.0
+
+[node name="Chat" type="Panel" parent="."]
+offset_left = 328.0
+offset_top = 162.0
+offset_right = 1103.0
+offset_bottom = 552.0
+
+[node name="Label" type="Label" parent="Chat"]
+layout_mode = 0
+offset_left = 69.0
+offset_top = 4.0
+offset_right = 149.0
+offset_bottom = 27.0
+scale = Vector2(1.91864, 1.85392)
+text = "Lobby Name: "
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Chat"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 51.0
+offset_right = 761.0
+offset_bottom = 393.0
+
+[node name="SteamName" type="Label" parent="."]
+offset_left = 855.0
+offset_top = 11.0
+offset_right = 963.0
+offset_bottom = 34.0
+text = "Steam Name: "
+
+[node name="StartButton" type="Button" parent="."]
+offset_left = 847.0
+offset_top = 39.0
+offset_right = 958.0
+offset_bottom = 70.0
+scale = Vector2(2.69961, 2.68139)
+text = "Start Game
+"
+
+[node name="CreateButton" type="Button" parent="."]
+offset_left = 4.0
+offset_top = -2.99999
+offset_right = 115.0
+offset_bottom = 28.0
+scale = Vector2(2.69961, 2.68139)
+text = "Create Lobby
+"
+
+[node name="TextEdit" type="TextEdit" parent="CreateButton"]
+layout_mode = 0
+offset_left = 115.572
+offset_top = 16.0365
+offset_right = 258.572
+offset_bottom = 30.0365
+
+[node name="Label" type="Label" parent="CreateButton"]
+layout_mode = 0
+offset_left = 117.054
+offset_top = 2.61059
+offset_right = 215.054
+offset_bottom = 25.6106
+scale = Vector2(1, 0.656894)
+text = "Lobby Name"
+
+[node name="JoinButton" type="Button" parent="."]
+offset_left = 142.0
+offset_top = 87.0
+offset_right = 231.0
+offset_bottom = 118.0
+scale = Vector2(1.81291, 1.84139)
+text = "Join Lobby
+"
+
+[node name="LeaveButton" type="Button" parent="."]
+offset_left = 10.0
+offset_top = 556.0
+offset_right = 121.0
+offset_bottom = 587.0
+scale = Vector2(2.69961, 2.68139)
+text = "Leave Lobby
+"
+
+[node name="SendButton" type="Button" parent="."]
+offset_left = 341.0
+offset_top = 570.0
+offset_right = 459.0
+offset_bottom = 601.0
+scale = Vector2(1.81291, 1.84139)
+text = "Send Message"
+
+[node name="TextEdit" type="TextEdit" parent="SendButton"]
+layout_mode = 0
+offset_left = 122.455
+offset_top = 3.25841
+offset_right = 265.455
+offset_bottom = 29.2584
+scale = Vector2(2.09283, 0.910948)
+
+[node name="Popup" type="PopupPanel" parent="."]
+size = Vector2i(1171, 675)
+
+[node name="Panel" type="Panel" parent="Popup"]
+anchors_preset = -1
+anchor_left = -0.092
+anchor_top = -0.024
+anchor_right = -0.092
+anchor_bottom = -0.024
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 1167.0
+offset_bottom = 671.0
+scale = Vector2(21.44, 11.72)
+
+[node name="Label" type="Label" parent="Popup/Panel"]
+layout_mode = 0
+offset_left = 0.373134
+offset_top = 0.938565
+offset_right = 79.3731
+offset_bottom = 23.9386
+scale = Vector2(0.317164, 0.290102)
+text = "Lobby List"
+
+[node name="Close" type="Button" parent="Popup/Panel"]
+layout_mode = 0
+offset_left = 35.2146
+offset_top = 46.587
+offset_right = 159.215
+offset_bottom = 77.587
+scale = Vector2(0.14234, 0.287089)
+text = "Close lobby list"
+
+[node name="Scroll" type="ScrollContainer" parent="Popup/Panel"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 10.0
+offset_right = 535.0
+offset_bottom = 163.0
+scale = Vector2(0.0988806, 0.242321)
+
+[node name="VBox" type="VBoxContainer" parent="Popup/Panel/Scroll"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+
+[connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="CreateButton" to="." method="_on_create_button_pressed"]
+[connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
+[connection signal="pressed" from="LeaveButton" to="." method="_on_leave_button_pressed"]
+[connection signal="pressed" from="SendButton" to="." method="_on_send_button_pressed"]
+[connection signal="pressed" from="Popup/Panel/Close" to="." method="_on_close_pressed"]
