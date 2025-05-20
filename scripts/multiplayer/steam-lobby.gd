@@ -1,8 +1,7 @@
-extends Node2D
+extends Control
 
 enum LobbyStatus { Private, Friends, Public, Invisible }
 enum SearchDistance { Close, Default, Far, Worldwide }
-
 @onready var steam_name_label = $SteamName
 @onready var lobby_name_input = $CreateButton/TextEdit
 @onready var chat_input = $SendButton/TextEdit
@@ -32,6 +31,8 @@ func create_lobby():
 	if Global.LOBBY_ID == 0:
 		Steam.createLobby(LobbyStatus.Public, Global.MAX_LOBBY_PLAYERS)
 
+
+
 func join_lobby(lobby_id):
 	print("Joining lobby:", lobby_id)
 	lobby_popup.hide()
@@ -54,9 +55,15 @@ func set_lobby_members():
 
 	for i in count:
 		var id = Steam.getLobbyMemberByIndex(Global.LOBBY_ID, i)
-		var name = Steam.getFriendPersonaName(id)
+		var steamName = Steam.getFriendPersonaName(id)
 		print("Member: %s (%s)" % [name, id])
-		Global.LOBBY_MEMBERS.append({ "steam-id": id, "steam-name": name })
+		Global.LOBBY_MEMBERS.append({ "steam-id": id, "steam-name": steamName })
+		await get_tree().create_timer(0.3).timeout
+		get_parent().announce_steam_id.rpc_id(1, Steam.getSteamID())
+		#if multiplayer.is_server():
+			#get_parent().announce_steam_id(Steam.getSteamID()) 
+		#else:
+			#get_parent().announce_steam_id.rpc_id(1, Steam.getSteamID())
 
 	update_player_list()
 
@@ -85,6 +92,8 @@ func _on_lobby_created(success, lobby_id):
 		display_message("Created Lobby: %s" % lobby_name)
 		Steam.setLobbyData(lobby_id, "name", lobby_name)
 		lobby_name_label.text = lobby_name
+		
+		get_parent().spawn_player(multiplayer.get_unique_id())
 	else:
 		display_message("Failed to create lobby.")
 
@@ -93,11 +102,11 @@ func _on_lobby_match_list(lobby_ids):
 		child.queue_free()
 
 	for lobby_id in lobby_ids:
-		var name = Steam.getLobbyData(lobby_id, "name")
+		var lobbyName = Steam.getLobbyData(lobby_id, "name")
 		var count = Steam.getNumLobbyMembers(lobby_id)
 		
 		var btn = Button.new()
-		btn.text = "Lobby %s: %s (%d players)" % [lobby_id, name, count]
+		btn.text = "Lobby %s: %s (%d players)" % [lobby_id, lobbyName, count]
 		btn.size = Vector2(800, 50)
 		btn.name = "lobby_%s" % str(lobby_id)
 		btn.connect("pressed", Callable(self, "join_lobby").bind(lobby_id))
@@ -109,6 +118,10 @@ func _on_lobby_joined(lobby_id, _perm, _locked, _response):
 	var name = Steam.getLobbyData(lobby_id, "name")
 	lobby_name_label.text = name
 	print("Joined lobby:", name)
+
+	await get_tree().create_timer(0.3).timeout  # small delay to let multiplayer sync
+	get_parent().request_spawn.rpc_id(1)  # Ask host to spawn our player node
+
 	set_lobby_members()
 
 func _on_lobby_join_requested(lobby_id, friend_id):
@@ -116,8 +129,8 @@ func _on_lobby_join_requested(lobby_id, friend_id):
 	display_message("%s invited you to a lobby." % friend_name)
 	join_lobby(lobby_id)
 
-func _on_lobby_data_update(success, lobby_id, member_id, key):
-	print("Lobby data updated | Success: %s | Lobby: %s | Member: %s | Key: %s" % [success, lobby_id, member_id, key])
+func _on_lobby_data_update(lobby_id: int, member_id: int, success: bool):
+	print("Lobby data updated | Success: %s | Lobby: %d | Member: %d" % [str(success), lobby_id, member_id])
 
 func _on_lobby_chat_update(_lobby_id, changed_id, _making_change_id, chat_state):
 	var name = Steam.getFriendPersonaName(changed_id)
@@ -152,10 +165,12 @@ func leave_lobby():
 
 	Global.LOBBY_MEMBERS.clear()
 
-# --- UI Events ---
-
 func _on_start_button_pressed():
-	get_tree().change_scene_to_file("res://scenes/game.tscn")
+	if Global.LOBBY_MEMBERS.size() > 0:
+		self.hide()
+		for member in Global.LOBBY_MEMBERS:
+			print(member['steam-id'])
+			get_parent().add_player_internal(member['steam-id'])
 
 func _on_create_button_pressed():
 	create_lobby()

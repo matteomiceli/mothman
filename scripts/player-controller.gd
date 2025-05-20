@@ -73,8 +73,13 @@ var is_snapping := false
 var hanging_val := 0.0
 
 func _enter_tree():
-	#print_full_tree() # debug
-	set_multiplayer_authority(name.to_int())
+	print(Global.steam_id_to_peer_id)
+	print(Global.peer_id_to_steam_id)
+	print(name)
+	if Global.steam_id_to_peer_id.has(name.to_int()):
+		set_multiplayer_authority(Global.steam_id_to_peer_id[name.to_int()])
+	else:
+		set_multiplayer_authority(1)  # fallback to host
 	print("name:", name, " id:", multiplayer.get_unique_id(), " auth:", get_multiplayer_authority())
 
 func _ready():
@@ -329,15 +334,3 @@ func _process(_delta):
 	if is_swinging and swing_anchor:
 		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_binormal * 2.0, Color.RED)
 		DebugDraw3D.draw_line(swing_anchor.global_position, swing_anchor.global_position + swing_plane_normal * 2.0, Color.BLUE)
-
-func print_full_tree():
-	var root = get_tree().root
-	_print_tree_recursive(root, 0)
-
-func _print_tree_recursive(node: Node, indent: int):
-	var padding = ""
-	for i in range(indent):
-		padding += "  "
-	print(padding + node.name + " (" + node.get_class() + ")")
-	for child in node.get_children():
-		_print_tree_recursive(child, indent + 1)

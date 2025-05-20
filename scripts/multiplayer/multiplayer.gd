@@ -1,17 +1,27 @@
-extends Node
+extends Node3D
 
-@onready var player_color_picker = $ServerMenu/ItemList/PlayerColorPicker
-@onready var world = $World
+#@onready var player_color_picker = $ServerMenu/ItemList/PlayerColorPicker
+@onready var player_spawner := $World/PlayersSpawn
+var Player = preload("res://scenes/player.tscn")
 
+func set_player_spawner(node: Node):
+	player_spawner = node
 const PORT = 4433
-
 func _ready() -> void:
+	Global.print_full_tree()
 	# Pause game
 	get_tree().paused = true
 
 	start_server()
 	register_listeners()
 	#Global.countdown_finished.connect(_on_countdown_finished)
+	
+	if Global.game_mode == Global.MODE.SINGLEPLAYER:
+		add_player(1)
+		pass
+	else:
+		for player in Global.LOBBY_MEMBERS:
+			add_player(player['steam-id'])
 
 func start_server(): 
 	multiplayer.server_relay = false
@@ -23,18 +33,18 @@ func start_server():
 
 func register_listeners():
 	if not multiplayer.is_server(): return
-
+	
 	multiplayer.peer_connected.connect(add_player.rpc)
-	multiplayer.peer_disconnected.connect(world.remove_player)
-
+	multiplayer.peer_disconnected.connect(remove_player)
+	
 @rpc("authority", "call_local")
 func add_player(id):
 	# This peer's player
 	if id == multiplayer.get_unique_id():
-		world.add_player(id, player_color_picker.color)
+		add_player_internal(id)
 		return
 	
-	world.add_player(id)
+	add_player(id)
 
 func _on_host_pressed():
 	# Start host
@@ -46,7 +56,7 @@ func _on_host_pressed():
 	multiplayer.multiplayer_peer = peer
 
 	# Add server host player
-	world.add_player(multiplayer.get_unique_id(), player_color_picker.color)
+	$World.add_player(multiplayer.get_unique_id())
 	start_game()
 	
 func _on_client_pressed():
@@ -78,4 +88,20 @@ func _exit_tree() -> void:
 	if not multiplayer.is_server(): return 
 
 	multiplayer.peer_connected.disconnect(add_player.rpc)
-	multiplayer.peer_disconnected.disconnect(world.remove_player)
+	multiplayer.peer_disconnected.disconnect(remove_player)
+
+func add_player_internal(id: int, color: Color = Color(1,1,1)):
+	var player = Player.instantiate()
+	player.name = str(id)
+	player.hoody_color = color
+	if len(Global.LOBBY_MEMBERS) > 0:
+		# TODO - This positioning doesn't work yet - this forum thread might help
+		# https://forum.godotengine.org/t/setting-position-on-spawn-in-multiplayer-causes-client-to-spawn-at-0-0-0/78584/7
+		player.position.x += 10
+	
+	player_spawner.add_child(player)
+
+func remove_player(id: int):
+	print("remove", id)
+	if player_spawner.has_node(str(id)):
+		player_spawner.get_node(str(id)).queue_free()

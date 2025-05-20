@@ -5,7 +5,7 @@ var players: Array[Node3D] = []
 
 func _ready() -> void:
 	initial_position = self.global_position
-	Global.connect("player_spawned", Callable(self, "_on_player_spawned"))
+	Global.connect("player_spawned", _on_player_spawned)
 	if Global.player != null:
 		players.append(Global.player)
 

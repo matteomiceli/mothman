@@ -1,6 +1,6 @@
 extends Node
 
-signal player_spawned(player: Node3D)
+signal player_spawned()
 signal countdown_finished()
 var player: Node3D = null
 
@@ -17,6 +17,9 @@ var LOBBY_ID = 0
 var LOBBY_MEMBERS = []
 var LOBBY_INVITE_ARG = false
 var MAX_LOBBY_PLAYERS = 8
+
+var steam_id_to_peer_id: Dictionary = {}
+var peer_id_to_steam_id: Dictionary = {}
 
 func _init():
 	OS.set_environment("SteamAppId", str(APP_ID))
@@ -37,5 +40,17 @@ func _ready():
 	STEAM_NAME = Steam.getPersonaName()
 	print("Steam initialized.\n online: %s, steam_id: %s, steam_name: %s" % [ONLINE, STEAM_ID, STEAM_NAME])
 
-func _process(delta):
+func _process(_delta):
 	Steam.run_callbacks()
+
+func print_full_tree():
+	var root = get_tree().root
+	_print_tree_recursive(root, 0)
+
+func _print_tree_recursive(node: Node, indent: int):
+	var padding = ""
+	for i in range(indent):
+		padding += "  "
+	print(padding + node.name + " (" + node.get_class() + ")")
+	for child in node.get_children():
+		_print_tree_recursive(child, indent + 1)

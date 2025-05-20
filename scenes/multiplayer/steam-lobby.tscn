@@ -1,11 +1,14 @@
 [gd_scene load_steps=2 format=3 uid="uid://b8xdr5adrprlp"]
 
-[ext_resource type="Script" uid="uid://wdtu2oqpwdfy" path="res://scripts/steam-lobby.gd" id="1_e0ibk"]
+[ext_resource type="Script" uid="uid://wdtu2oqpwdfy" path="res://scripts/multiplayer/steam-lobby.gd" id="1_smknm"]
 
-[node name="Main" type="Node2D"]
-script = ExtResource("1_e0ibk")
+[node name="SteamLobby" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_smknm")
 
 [node name="Players" type="Panel" parent="."]
+layout_mode = 0
 offset_left = 13.0
 offset_top = 157.0
 offset_right = 306.0
@@ -28,6 +31,7 @@ offset_right = 287.0
 offset_bottom = 374.0
 
 [node name="Chat" type="Panel" parent="."]
+layout_mode = 0
 offset_left = 328.0
 offset_top = 162.0
 offset_right = 1103.0
@@ -50,6 +54,7 @@ offset_right = 761.0
 offset_bottom = 393.0
 
 [node name="SteamName" type="Label" parent="."]
+layout_mode = 0
 offset_left = 855.0
 offset_top = 11.0
 offset_right = 963.0
@@ -57,6 +62,7 @@ offset_bottom = 34.0
 text = "Steam Name: "
 
 [node name="StartButton" type="Button" parent="."]
+layout_mode = 0
 offset_left = 847.0
 offset_top = 39.0
 offset_right = 958.0
@@ -66,6 +72,7 @@ text = "Start Game
 "
 
 [node name="CreateButton" type="Button" parent="."]
+layout_mode = 0
 offset_left = 4.0
 offset_top = -2.99999
 offset_right = 115.0
@@ -91,6 +98,7 @@ scale = Vector2(1, 0.656894)
 text = "Lobby Name"
 
 [node name="JoinButton" type="Button" parent="."]
+layout_mode = 0
 offset_left = 142.0
 offset_top = 87.0
 offset_right = 231.0
@@ -100,6 +108,7 @@ text = "Join Lobby
 "
 
 [node name="LeaveButton" type="Button" parent="."]
+layout_mode = 0
 offset_left = 10.0
 offset_top = 556.0
 offset_right = 121.0
@@ -109,6 +118,7 @@ text = "Leave Lobby
 "
 
 [node name="SendButton" type="Button" parent="."]
+layout_mode = 0
 offset_left = 341.0
 offset_top = 570.0
 offset_right = 459.0

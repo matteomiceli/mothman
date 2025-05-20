@@ -5,29 +5,26 @@
 [node name="Game" type="Node3D"]
 script = ExtResource("1_uwrxv")
 
-[node name="Mode" type="Node3D" parent="."]
+[node name="Multiplayer" parent="."]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+script = null
 
-[node name="Menu" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Singleplayer" type="Button" parent="Menu"]
-layout_mode = 0
-offset_left = 441.0
-offset_top = 180.0
-offset_right = 692.0
-offset_bottom = 258.0
-text = "Singleplayer"
-
-[node name="Multiplayer" type="Button" parent="Menu"]
-layout_mode = 0
-offset_left = 441.0
-offset_top = 281.0
-offset_right = 692.0
-offset_bottom = 359.0
-text = "Multiplayer"
-
-[connection signal="pressed" from="Menu/Singleplayer" to="." method="_on_singleplayer_pressed"]
-[connection signal="pressed" from="Menu/Multiplayer" to="." method="_on_multiplayer_pressed"]
+[node name="Singleplayer" parent="."]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+script = null

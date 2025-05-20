@@ -2,11 +2,11 @@ extends Node3D
 
 func _on_singleplayer_pressed():
 	Global.game_mode = Global.MODE.SINGLEPLAYER
-	$Mode.add_child(preload("res://scenes/singleplayer.tscn").instantiate())
+	remove_child($Multiplayer)
 	$Menu.hide()
 
 
 func _on_multiplayer_pressed():
 	Global.game_mode = Global.MODE.MULTIPLAYER
-	$Mode.add_child(preload("res://scenes/multiplayer.tscn").instantiate())
+	remove_child($Singleplayer)
 	$Menu.hide()

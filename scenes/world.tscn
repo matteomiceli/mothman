@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://c05byuu4pif4x"]
+[gd_scene load_steps=10 format=3 uid="uid://c05byuu4pif4x"]
 
-[ext_resource type="Script" uid="uid://b2tk02yely8by" path="res://scripts/world.gd" id="1_qfnet"]
+[ext_resource type="PackedScene" uid="uid://b8xdr5adrprlp" path="res://scenes/multiplayer/steam-lobby.tscn" id="1_4mrxx"]
+[ext_resource type="Script" uid="uid://dgygpwq5grigy" path="res://scripts/world.gd" id="1_qfnet"]
 [ext_resource type="PackedScene" uid="uid://6s1mmgwdx7un" path="res://scenes/floor.tscn" id="1_rwgxs"]
 [ext_resource type="Script" uid="uid://c10xmvg2cs3yh" path="res://scripts/camera-3d.gd" id="3_4wyf3"]
 [ext_resource type="PackedScene" uid="uid://cby1gh4t28jlq" path="res://scenes/box.tscn" id="3_k0juu"]
@@ -12,15 +13,125 @@
 [node name="World" type="Node3D"]
 script = ExtResource("1_qfnet")
 
-[node name="Floor" parent="." instance=ExtResource("1_rwgxs")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+[node name="MainMenu" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
-[node name="PlayersSpawn" type="Node3D" parent="."]
+[node name="Singleplayer" type="Button" parent="MainMenu"]
+layout_mode = 0
+offset_left = 441.0
+offset_top = 180.0
+offset_right = 692.0
+offset_bottom = 258.0
+text = "Singleplayer"
+
+[node name="Multiplayer" type="Button" parent="MainMenu"]
+layout_mode = 0
+offset_left = 441.0
+offset_top = 281.0
+offset_right = 692.0
+offset_bottom = 359.0
+text = "Multiplayer"
+
+[node name="SteamLobby" parent="." instance=ExtResource("1_4mrxx")]
+visible = false
+
+[node name="ServerMenu" type="Control" parent="."]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 646.0
+
+[node name="ItemList" type="ItemList" parent="ServerMenu"]
+layout_mode = 0
+offset_right = 1151.0
+offset_bottom = 642.0
+
+[node name="Label" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 135.0
+offset_right = 126.0
+offset_bottom = 164.0
+text = "Server shit:"
+vertical_alignment = 1
+
+[node name="Color" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 230.0
+offset_right = 161.0
+offset_bottom = 259.0
+text = "Color:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="or" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 356.0
+offset_right = 160.0
+offset_bottom = 385.0
+text = "or"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ip" type="LineEdit" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 51.0
+offset_top = 397.0
+offset_right = 248.0
+offset_bottom = 437.0
+scale = Vector2(0.963334, 0.996)
+placeholder_text = "ip_address:port"
+
+[node name="host" type="Button" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 298.0
+offset_right = 172.0
+offset_bottom = 344.0
+text = "Host"
+
+[node name="PlayerColorPicker" type="ColorPickerButton" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 221.0
+offset_right = 216.0
+offset_bottom = 267.0
+color = Color(0.385, 0.5005, 0.77, 1)
+
+[node name="client_connect" type="Button" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 270.0
+offset_top = 397.0
+offset_right = 390.0
+offset_bottom = 438.0
+text = "Connect"
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://c17h2tuj0i08t")
 spawn_path = NodePath("../PlayersSpawn")
-spawn_limit = 4
+spawn_limit = 8
+
+[node name="PlayersSpawn" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.797542, 0.603263, 0, -0.603263, 0.797542, -0.0660871, 20.2415, 42.5806)
+fov = 50.6
+script = ExtResource("3_4wyf3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.997549, 0.0658961, 0.0235181, -0.0570181, 0.570821, 0.819092, 0.0405504, -0.818426, 0.573179, 0, 15.5293, 4.87762)
+light_energy = 1.635
+shadow_enabled = true
+
+[node name="Floor" parent="." instance=ExtResource("1_rwgxs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="Bar" parent="." instance=ExtResource("3_qfnet")]
 transform = Transform3D(-0.0152362, 0, -0.999884, 0, 1, 0, 0.999884, 0, -0.0152362, -0.0112033, 2.74617, 2.76311)
@@ -43,16 +154,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.110913, 10.1043)
 [node name="Box3" parent="." instance=ExtResource("3_k0juu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.79391)
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.997549, 0.0658961, 0.0235181, -0.0570181, 0.570821, 0.819093, 0.0405504, -0.818426, 0.573179, 0, 15.5293, 4.87762)
-light_energy = 1.635
-shadow_enabled = true
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.797542, 0.603263, 0, -0.603263, 0.797542, -0.0660871, 20.2415, 42.5806)
-fov = 50.6
-script = ExtResource("3_4wyf3")
-
 [node name="CountdownLayer" type="CanvasLayer" parent="."]
 process_mode = 3
 visible = false
@@ -74,3 +175,6 @@ theme_override_fonts/font = ExtResource("8_4mrxx")
 theme_override_font_sizes/font_size = 500
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[connection signal="pressed" from="MainMenu/Singleplayer" to="." method="_on_singleplayer_pressed"]
+[connection signal="pressed" from="MainMenu/Multiplayer" to="." method="_on_multiplayer_pressed"]
