@@ -11,11 +11,11 @@ func _ready() -> void:
 	pass
 
 @rpc("call_local")
-func jump():
+func jump() -> void:
 	jumping = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta) -> void:
+func _process(_delta: float) -> void:
 	if not is_multiplayer_authority():
 		return
 	input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")

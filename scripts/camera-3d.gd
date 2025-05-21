@@ -27,11 +27,11 @@ func _physics_process(_delta: float) -> void:
 	var max_distance := 0.0
 	for i in range(players.size()):
 		for j in range(i + 1, players.size()):
-			var d = players[i].global_position.distance_to(players[j].global_position)
+			var d := players[i].global_position.distance_to(players[j].global_position)
 			max_distance = max(max_distance, d)
 
 	# Adjust zoom by moving the camera along its back-facing direction
-	var base_offset := Vector3(0.0, 0.0, 15.0)  # Y = height, Z = depth
+	var base_offset := Vector3(0.0, 0.0, 15.0) # Y = height, Z = depth
 	var zoom_multiplier: float = clamp(max_distance * 0.4, 5.0, 25.0)
 	var offset: Vector3 = base_offset + Vector3(0.0, 0.0, zoom_multiplier)
 

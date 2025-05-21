@@ -1,11 +1,11 @@
 extends CanvasLayer
 
-@onready var countdown_label = $CountdownLabel
+@onready var countdown_label := $CountdownLabel
 
 var countdown_time := 3
-var timer = null
+var timer: Timer
 
-func _ready():
+func _ready() -> void:
 	countdown_label.text = str(countdown_time)
 	timer = Timer.new()
 	timer.wait_time = 1.0
@@ -14,7 +14,7 @@ func _ready():
 	add_child(timer)
 	timer.start()
 
-func _on_timer_timeout():
+func _on_timer_timeout() -> void:
 	countdown_time -= 1
 
 	if countdown_time > 0:
