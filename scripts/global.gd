@@ -4,7 +4,7 @@ signal player_spawned(player: Node3D)
 signal countdown_finished()
 var player: Node3D = null
 
-enum MODE {MULTIPLAYER, SINGLEPLAYER, NULL}
+enum MODE {MULTIPLAYER, SINGLEPLAYER, STEAM_MULTIPLAYER, NULL}
 var game_mode: MODE = MODE.NULL
 
 var APP_ID = 480 # Spacewar, dev app id
@@ -23,6 +23,14 @@ func _init():
 	OS.set_environment("SteamGameId", str(APP_ID))
 
 func _ready():
+	if game_mode == MODE.STEAM_MULTIPLAYER:
+		initialize_steam()
+
+func _process(delta: float):
+	if game_mode == MODE.STEAM_MULTIPLAYER:
+		Steam.run_callbacks()
+
+func initialize_steam() ->  void:
 	var init: Dictionary = Steam.steamInitEx(APP_ID)
 	if init['status'] != 0:
 		print("Failed to instantiate Steam: %s. Shutting down..." % init['verbal'])
@@ -36,6 +44,3 @@ func _ready():
 	STEAM_ID = Steam.getSteamID()
 	STEAM_NAME = Steam.getPersonaName()
 	print("Steam initialized.\n online: %s, steam_id: %s, steam_name: %s" % [ONLINE, STEAM_ID, STEAM_NAME])
-
-func _process(delta):
-	Steam.run_callbacks()
