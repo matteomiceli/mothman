@@ -7,6 +7,8 @@ extends CharacterBody3D
 @onready var dash_bar = get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
 @onready var hoody_mesh: MeshInstance3D = $PlayerModel/Armature/Skeleton3D/Hoody
 
+@onready var input_synchronizer = $Sync/InputSynchronizer
+
 
 # Audio
 const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
@@ -74,7 +76,6 @@ var hanging_val := 0.0
 
 func _enter_tree():
 	#print_full_tree() # debug
-	set_multiplayer_authority(name.to_int())
 	print("name:", name, " id:", multiplayer.get_unique_id(), " auth:", get_multiplayer_authority())
 
 func _ready():
@@ -82,25 +83,28 @@ func _ready():
 	Global.emit_signal("player_spawned", self)
 	apply_character_customization()
 
+	# Give peer authority over player input -- server manages movement
+	input_synchronizer.set_multiplayer_authority(name.to_int())
+
 func _physics_process(delta):
 	#print(is_wall_running) # debug
 	handle_inputs()
 	handle_animations(delta)
 
-	if is_multiplayer_authority():
-		handle_dash_cooldown(delta)
-		if is_snapping:
-			handle_snap(delta)
-		elif is_swinging:
-			handle_swing(delta)
-		else:
-			apply_gravity(delta)
-			handle_movement(delta)
-			handle_dash_decay(delta)
-			detect_wall_run()
-			handle_wall_run(delta)
-			handle_footsteps(delta)
-			move_and_slide()
+	if not multiplayer.is_server(): return 
+	handle_dash_cooldown(delta)
+	if is_snapping:
+		handle_snap(delta)
+	elif is_swinging:
+		handle_swing(delta)
+	else:
+		apply_gravity(delta)
+		handle_movement(delta)
+		handle_dash_decay(delta)
+		detect_wall_run()
+		handle_wall_run(delta)
+		handle_footsteps(delta)
+		move_and_slide()
 
 func handle_snap(delta):
 	snap_time += delta
@@ -203,7 +207,8 @@ func apply_gravity(delta):
 			anim_tree.set("parameters/fire_jump/request", AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FADE_OUT)
 
 func handle_movement(delta):
-	var input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
+	#print(">>>", input_synchronizer.input_dir)
+	var input_dir: Vector2 = input_synchronizer.input_dir
 	var speed = MOVE_SPEED * (CROUCH_SPEED_MULTIPLIER if is_crouching else 1.0)
 	var input_velocity = Vector3(input_dir.x, 0, input_dir.y) * speed
 	var target_velocity = input_velocity + dash_velocity

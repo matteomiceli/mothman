@@ -4,3 +4,6 @@
 
 *.tmp
 .vscode
+
+# macOS
+.DS_Store
