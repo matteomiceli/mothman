@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b8xdr5adrprlp"]
 
-[ext_resource type="Script" path="res://scripts/steam-lobby.gd" id="1_e0ibk"]
+[ext_resource type="Script" uid="uid://wdtu2oqpwdfy" path="res://scripts/steam-lobby.gd" id="1_e0ibk"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_e0ibk")
