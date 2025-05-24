@@ -155,6 +155,7 @@ func leave_lobby():
 # --- UI Events ---
 
 func _on_start_button_pressed():
+	Global.game_mode = Global.MODE.STEAM_MULTIPLAYER
 	get_tree().change_scene_to_file("res://scenes/game.tscn")
 
 func _on_create_button_pressed():
