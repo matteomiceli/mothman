@@ -24,10 +24,9 @@ func start_server():
 func register_listeners():
 	if not multiplayer.is_server(): return
 
-	multiplayer.peer_connected.connect(add_player.rpc)
+	multiplayer.peer_connected.connect(add_player)
 	multiplayer.peer_disconnected.connect(world.remove_player)
 
-@rpc("authority", "call_local")
 func add_player(id):
 	# This peer's player
 	if id == multiplayer.get_unique_id():
@@ -77,5 +76,5 @@ func _exit_tree() -> void:
 	# Cleanup listeners
 	if not multiplayer.is_server(): return 
 
-	multiplayer.peer_connected.disconnect(add_player.rpc)
+	multiplayer.peer_connected.disconnect(add_player)
 	multiplayer.peer_disconnected.disconnect(world.remove_player)
