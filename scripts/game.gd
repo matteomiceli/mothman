@@ -21,9 +21,13 @@ func _on_singleplayer_pressed() -> void:
 
 func _on_multiplayer_pressed() -> void:
 	Global.game_mode = Global.MODE.MULTIPLAYER
-	$Mode.add_child(preload("res://scenes/multiplayer.tscn").instantiate())
+	$Mode.add_child(preload("res://scenes/multiplayer/multiplayer.tscn").instantiate())
 	$Menu.hide()
 
+func _on_steam_pressed() -> void:
+	Global.game_mode = Global.MODE.STEAM_MULTIPLAYER
+	$Mode.add_child(preload("res://scenes/multiplayer/steam-lobby.tscn").instantiate())
+	$Menu.hide()
 
 func init_steam() ->  void:
 	var init: Dictionary = Steam.steamInitEx(Global.APP_ID)

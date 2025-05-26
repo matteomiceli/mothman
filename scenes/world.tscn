@@ -1,11 +1,11 @@
 [gd_scene load_steps=9 format=3 uid="uid://c05byuu4pif4x"]
 
 [ext_resource type="Script" uid="uid://b2tk02yely8by" path="res://scripts/world.gd" id="1_qfnet"]
-[ext_resource type="PackedScene" uid="uid://6s1mmgwdx7un" path="res://scenes/floor.tscn" id="1_rwgxs"]
+[ext_resource type="PackedScene" uid="uid://6s1mmgwdx7un" path="res://scenes/things/floor.tscn" id="1_rwgxs"]
 [ext_resource type="Script" uid="uid://c10xmvg2cs3yh" path="res://scripts/camera-3d.gd" id="3_4wyf3"]
-[ext_resource type="PackedScene" uid="uid://cby1gh4t28jlq" path="res://scenes/box.tscn" id="3_k0juu"]
-[ext_resource type="PackedScene" uid="uid://34ggt478yj3t" path="res://scenes/bar.tscn" id="3_qfnet"]
-[ext_resource type="PackedScene" uid="uid://b8aoy26couqrv" path="res://scenes/wall.tscn" id="5_71j4m"]
+[ext_resource type="PackedScene" uid="uid://cby1gh4t28jlq" path="res://scenes/things/box.tscn" id="3_k0juu"]
+[ext_resource type="PackedScene" uid="uid://34ggt478yj3t" path="res://scenes/things/bar.tscn" id="3_qfnet"]
+[ext_resource type="PackedScene" uid="uid://b8aoy26couqrv" path="res://scenes/things/wall.tscn" id="5_71j4m"]
 [ext_resource type="Script" uid="uid://bmmrue78fxehb" path="res://scripts/canvas-layer.gd" id="7_i7141"]
 [ext_resource type="FontFile" uid="uid://bsbglbevsg75j" path="res://assets/fonts/Orbitron-Regular.ttf" id="8_4mrxx"]
 

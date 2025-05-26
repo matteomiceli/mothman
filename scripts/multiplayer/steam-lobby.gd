@@ -18,13 +18,13 @@ func _ready() -> void:
 	steam_name_label.text = Global.STEAM_NAME
 
 	# Connect Steam signals
-	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
-	Steam.connect("lobby_match_list", Callable(self, "_on_lobby_match_list"))
-	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
-	Steam.connect("lobby_chat_update", Callable(self, "_on_lobby_chat_update"))
-	Steam.connect("lobby_message", Callable(self, "_on_lobby_message"))
-	Steam.connect("lobby_data_update", Callable(self, "_on_lobby_data_update"))
-	Steam.connect("join_requested", Callable(self, "_on_lobby_join_requested"))
+	Steam.connect("lobby_created", _on_lobby_created)
+	Steam.connect("lobby_match_list", _on_lobby_match_list)
+	Steam.connect("lobby_joined", _on_lobby_joined)
+	Steam.connect("lobby_chat_update", _on_lobby_chat_update)
+	Steam.connect("lobby_message", _on_lobby_message)
+	Steam.connect("lobby_data_update", _on_lobby_data_update)
+	Steam.connect("join_requested", _on_lobby_join_requested)
 
 	check_command_line()
 
@@ -88,11 +88,11 @@ func _on_lobby_created(success: int, lobby_id: int) -> void:
 	else:
 		display_message("Failed to create lobby.")
 
-func _on_lobby_match_list(lobby_ids: Array[int]) -> void:
+func _on_lobby_match_list(lobby_ids: Variant) -> void:
 	for child in lobby_list_container.get_children():
 		child.queue_free()
 
-	for lobby_id in lobby_ids:
+	for lobby_id: int in lobby_ids:
 		var name := Steam.getLobbyData(lobby_id, "name")
 		var count := Steam.getNumLobbyMembers(lobby_id)
 		
@@ -116,8 +116,8 @@ func _on_lobby_join_requested(lobby_id: int, friend_id: int) -> void:
 	display_message("%s invited you to a lobby." % friend_name)
 	join_lobby(lobby_id)
 
-func _on_lobby_data_update(success: bool, lobby_id: int, member_id: int, key: String) -> void:
-	print("Lobby data updated | Success: %s | Lobby: %s | Member: %s | Key: %s" % [success, lobby_id, member_id, key])
+func _on_lobby_data_update(success: bool, lobby_id: int, member_id: int) -> void:
+	print("Lobby data updated | Success: %s | Lobby: %s | Member: %s" % [success, lobby_id, member_id])
 
 func _on_lobby_chat_update(_lobby_id: int, changed_id: int, _making_change_id: int, chat_state: int) -> void:
 	var name := Steam.getFriendPersonaName(changed_id)
@@ -152,11 +152,8 @@ func leave_lobby() -> void:
 
 	Global.LOBBY_MEMBERS.clear()
 
-# --- UI Events ---
-
 func _on_start_button_pressed() -> void:
-	Global.game_mode = Global.MODE.STEAM_MULTIPLAYER
-	get_tree().change_scene_to_file("res://scenes/game.tscn")
+	get_tree().change_scene_to_file("res://scenes/world.tscn")
 
 func _on_create_button_pressed() -> void:
 	create_lobby()
