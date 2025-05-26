@@ -26,6 +26,7 @@ offset_left = 12.0
 offset_top = 54.0
 offset_right = 287.0
 offset_bottom = 374.0
+bbcode_enabled = true
 
 [node name="Chat" type="Panel" parent="."]
 offset_left = 328.0
@@ -76,10 +77,10 @@ text = "Create Lobby
 
 [node name="TextEdit" type="TextEdit" parent="CreateButton"]
 layout_mode = 0
-offset_left = 115.572
-offset_top = 16.0365
-offset_right = 258.572
-offset_bottom = 30.0365
+offset_left = 116.0
+offset_top = 16.0
+offset_right = 276.0
+offset_bottom = 53.0
 
 [node name="Label" type="Label" parent="CreateButton"]
 layout_mode = 0
@@ -99,12 +100,21 @@ scale = Vector2(1.81291, 1.84139)
 text = "Join Lobby
 "
 
+[node name="ReadyButton" type="Button" parent="."]
+offset_left = 198.0
+offset_top = 556.0
+offset_right = 309.0
+offset_bottom = 587.0
+scale = Vector2(1.04225, 2.4266)
+text = "Ready Up
+"
+
 [node name="LeaveButton" type="Button" parent="."]
 offset_left = 10.0
 offset_top = 556.0
 offset_right = 121.0
 offset_bottom = 587.0
-scale = Vector2(2.69961, 2.68139)
+scale = Vector2(1.73961, 2.68139)
 text = "Leave Lobby
 "
 
@@ -172,6 +182,7 @@ layout_mode = 2
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="CreateButton" to="." method="_on_create_button_pressed"]
 [connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
+[connection signal="pressed" from="ReadyButton" to="." method="_on_ready_button_pressed"]
 [connection signal="pressed" from="LeaveButton" to="." method="_on_leave_button_pressed"]
 [connection signal="pressed" from="SendButton" to="." method="_on_send_button_pressed"]
 [connection signal="pressed" from="Popup/Panel/Close" to="." method="_on_close_pressed"]

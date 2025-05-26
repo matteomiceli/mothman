@@ -7,6 +7,8 @@ var player: Node3D = null
 enum MODE {MULTIPLAYER, SINGLEPLAYER, STEAM_MULTIPLAYER, NULL}
 var game_mode: MODE = MODE.NULL
 
+var ACTIVE_PLAYERS := []
+
 # Steam
 var APP_ID := 480 # Spacewar, dev app id
 var OWNED := false
