@@ -17,7 +17,7 @@ var LOBBY_MEMBERS := []
 var LOBBY_INVITE_ARG := false
 var MAX_LOBBY_PLAYERS := 8
 
-func _init():
+func _init() -> void:
 	OS.set_environment("SteamAppId", str(APP_ID))
 	OS.set_environment("SteamGameId", str(APP_ID))
 

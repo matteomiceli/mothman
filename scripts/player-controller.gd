@@ -72,7 +72,7 @@ var snap_duration := 0.15
 var is_snapping := false
 var hanging_val := 0.0
 
-func _enter_tree():
+func _enter_tree() -> void:
 	set_multiplayer_authority(get_multiplayer_authority())
 	print("name:", name, " id:", multiplayer.get_unique_id(), " auth:", get_multiplayer_authority())
 
