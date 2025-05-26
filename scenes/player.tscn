@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://kyfsiduoekjh" path="res://assets/guy/guy_Ch28_1001_Normal.png" id="4_tuyoq"]
 [ext_resource type="AudioStream" uid="uid://cnv5d5rsrtktx" path="res://assets/sounds/footstep-3.wav" id="4_y4r1p"]
 [ext_resource type="AudioStream" uid="uid://bm6afawlp38se" path="res://assets/sounds/footstep-4.wav" id="5_d2wvv"]
-[ext_resource type="Script" uid="uid://8sqyqn80wj1i" path="res://scripts/player_input_synchronizer.gd" id="9_ur7pv"]
+[ext_resource type="Script" uid="uid://8sqyqn80wj1i" path="res://scripts/player-input-synchronizer.gd" id="9_ur7pv"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sh265"]
 
