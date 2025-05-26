@@ -165,7 +165,9 @@ func _on_start_button_pressed() -> void:
 		for member: Dictionary in Global.LOBBY_MEMBERS:
 			print(member['steam-id'])
 			get_parent().add_player_internal(member['steam-id'])
-
+	Global.game_mode = Global.MODE.STEAM_MULTIPLAYER
+	get_tree().change_scene_to_file("res://scenes/game.tscn")
+	
 func _on_create_button_pressed() -> void:
 	create_lobby()
 
