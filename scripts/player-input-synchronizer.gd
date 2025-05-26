@@ -12,4 +12,4 @@ func _physics_process(_delta: float) -> void:
 	if not is_multiplayer_authority(): return
 	input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
 
-    # TODO-MM: refactor rest of movement logic under this synchronizer
+	# TODO-MM: refactor rest of movement logic under this synchronizer
