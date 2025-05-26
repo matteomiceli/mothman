@@ -13,7 +13,7 @@ func _process(_delta: float) -> void:
 	if Global.game_mode == Global.MODE.STEAM_MULTIPLAYER:
 		Steam.run_callbacks()
 
-func _on_singleplayer_pressed():
+func _on_singleplayer_pressed() -> void:
 	Global.game_mode = Global.MODE.SINGLEPLAYER
 	remove_child($Multiplayer)
 	$Menu.hide()
