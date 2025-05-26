@@ -7,7 +7,7 @@ extends CharacterBody3D
 @onready var dash_bar := get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
 @onready var hoody_mesh: MeshInstance3D = $PlayerModel/Armature/Skeleton3D/Hoody
 
-@onready var input_synchronizer := $Sync/InputSync
+@onready var input_synchronizer := $Sync/InputSynchronizer
 
 # Audio
 const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
