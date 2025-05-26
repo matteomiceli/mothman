@@ -5,11 +5,18 @@ extends MultiplayerSynchronizer
 
 @export var input_dir: Vector2
 
-func _enter_tree() -> void:
-	pass
+# Actions -- simulate just_pressed, just_released
+@export var jump_pressed := false
 
 func _physics_process(_delta: float) -> void:
 	if not is_multiplayer_authority(): return
 	input_dir = Input.get_vector("strafe_left", "strafe_right", "move_forward", "move_back")
 
+	if Input.is_action_just_pressed("jump"):
+		jump.rpc()
+		
 	# TODO-MM: refactor rest of movement logic under this synchronizer
+
+@rpc("call_local")
+func jump() -> void:
+	jump_pressed = true

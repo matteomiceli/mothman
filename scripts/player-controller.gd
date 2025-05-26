@@ -108,17 +108,17 @@ func handle_snap(delta: float) -> void:
 		is_snapping = false
 
 func handle_inputs() -> void:
-	is_crouching = Input.is_action_pressed("crouch")
-	if is_crouching:
-		currAnim = AnimState.CROUCH
-	if Input.is_action_just_pressed("jump"):
+	if input_synchronizer.jump_pressed:
 		try_jump()
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
 		start_dash()
 	if Input.is_action_just_pressed("grab") and not is_swinging and swing_anchor:
 		start_swing()
-	elif Input.is_action_just_released("grab") and is_swinging:
+	if Input.is_action_just_released("grab") and is_swinging:
 		release_swing()
+
+	if Input.is_action_pressed("crouch"):
+		currAnim = AnimState.CROUCH
 
 func try_jump() -> void:
 	if is_on_floor():
@@ -130,6 +130,9 @@ func try_jump() -> void:
 		stop_wall_run()
 		velocity = (Vector3.UP + wall_normal * 0.5).normalized() * JUMP_VELOCITY
 		fire_jump_animation.rpc()
+
+ 	# reset action state on player input
+	input_synchronizer.jump_pressed = false
 
 func start_dash() -> void:
 	is_dashing = true

@@ -4799,7 +4799,7 @@ replication_config = SubResource("SceneReplicationConfig_qlg0r")
 [node name="InputSync" type="MultiplayerSynchronizer" parent="Sync"]
 root_path = NodePath("../..")
 replication_config = SubResource("SceneReplicationConfig_y4r1p")
-script = ExtResource("9_ur7pv")
+script = ExtResource("6_ur7pv")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0.851023, 0)
