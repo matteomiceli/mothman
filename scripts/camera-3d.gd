@@ -27,7 +27,7 @@ func _physics_process(_delta: float) -> void:
 	var max_distance := 0.0
 	for i in range(players.size()):
 		for j in range(i + 1, players.size()):
-			var d = players[i].global_position.distance_to(players[j].global_position)
+			var d := players[i].global_position.distance_to(players[j].global_position)
 			max_distance = max(max_distance, d)
 
 	# Adjust zoom by moving the camera along its back-facing direction

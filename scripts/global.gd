@@ -5,7 +5,7 @@ signal countdown_finished()
 var player: Node3D = null
 
 enum MODE {MULTIPLAYER, SINGLEPLAYER, STEAM_MULTIPLAYER, NULL}
-var game_mode: MODE = MODE.NULL
+var game_mode: MODE = MODE.STEAM_MULTIPLAYER
 
 # Steam
 var APP_ID := 480 # Spacewar, dev app id

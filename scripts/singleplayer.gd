@@ -7,8 +7,8 @@ func _ready() -> void:
 	# Debug to bypass countdown, remove
 	start_game()
 
-func _on_countdown_finished():
+func _on_countdown_finished() -> void:
 	start_game()
 
-func start_game():
+func start_game()-> void:
 	get_tree().paused = false

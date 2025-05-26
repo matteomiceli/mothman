@@ -1,8 +1,8 @@
 extends Node3D
 
-@onready var player_spawner = $PlayersSpawn
+@onready var player_spawner := $PlayersSpawn
 
-var Player = preload("res://scenes/player.tscn")
+var Player := preload("res://scenes/player.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -10,8 +10,8 @@ func _ready() -> void:
 		pass
 		add_player(1)
 
-func add_player(id: int, color: Color = Color(1,1,1)):
-	var player = Player.instantiate()
+func add_player(id: int, color: Color = Color(1,1,1)) -> void:
+	var player := Player.instantiate()
 	player.name = str(id)
 	player.hoody_color = color
 
@@ -22,7 +22,7 @@ func add_player(id: int, color: Color = Color(1,1,1)):
 	
 	player_spawner.add_child(player, true)
 
-func remove_player(id: int):
+func remove_player(id: int) -> void:
 	print("remove", id)
 	if player_spawner.has_node(str(id)):
 		player_spawner.get_node(str(id)).queue_free()
