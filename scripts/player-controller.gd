@@ -73,13 +73,7 @@ var is_snapping := false
 var hanging_val := 0.0
 
 func _enter_tree():
-	print(Global.steam_id_to_peer_id)
-	print(Global.peer_id_to_steam_id)
-	print(name)
-	if Global.steam_id_to_peer_id.has(name.to_int()):
-		set_multiplayer_authority(Global.steam_id_to_peer_id[name.to_int()])
-	else:
-		set_multiplayer_authority(1)  # fallback to host
+	set_multiplayer_authority(get_multiplayer_authority())
 	print("name:", name, " id:", multiplayer.get_unique_id(), " auth:", get_multiplayer_authority())
 
 func _ready():

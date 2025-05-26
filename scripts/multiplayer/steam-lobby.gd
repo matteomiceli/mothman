@@ -58,12 +58,6 @@ func set_lobby_members():
 		var steamName = Steam.getFriendPersonaName(id)
 		print("Member: %s (%s)" % [name, id])
 		Global.LOBBY_MEMBERS.append({ "steam-id": id, "steam-name": steamName })
-		await get_tree().create_timer(0.3).timeout
-		get_parent().announce_steam_id.rpc_id(1, Steam.getSteamID())
-		#if multiplayer.is_server():
-			#get_parent().announce_steam_id(Steam.getSteamID()) 
-		#else:
-			#get_parent().announce_steam_id.rpc_id(1, Steam.getSteamID())
 
 	update_player_list()
 
@@ -162,6 +156,7 @@ func leave_lobby():
 
 	for member in Global.LOBBY_MEMBERS:
 		Steam.closeP2PSessionWithUser(member["steam-id"])
+		get_parent().remove_player(member["steam-id"])
 
 	Global.LOBBY_MEMBERS.clear()
 

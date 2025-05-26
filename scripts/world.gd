@@ -118,11 +118,3 @@ func remove_player(id: int):
 	print("remove", id)
 	if player_spawner.has_node(str(id)):
 		player_spawner.get_node(str(id)).queue_free()
-		
-@rpc("any_peer")
-func announce_steam_id(steam_id: int):
-	print('called announce')
-	var peer_id = multiplayer.get_remote_sender_id()
-	Global.steam_id_to_peer_id[steam_id] = peer_id
-	Global.peer_id_to_steam_id[peer_id] = steam_id
-	print("Mapped Steam ID %s to Peer ID %s" % [steam_id, peer_id])

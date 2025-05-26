@@ -18,9 +18,6 @@ var LOBBY_MEMBERS = []
 var LOBBY_INVITE_ARG = false
 var MAX_LOBBY_PLAYERS = 8
 
-var steam_id_to_peer_id: Dictionary = {}
-var peer_id_to_steam_id: Dictionary = {}
-
 func _init():
 	OS.set_environment("SteamAppId", str(APP_ID))
 	OS.set_environment("SteamGameId", str(APP_ID))
