@@ -21,6 +21,7 @@ Global="*res://scripts/global.gd"
 [debug]
 
 file_logging/enable_file_logging=true
+gdscript/warnings/untyped_declaration=2
 
 [editor]
 

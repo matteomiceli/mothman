@@ -1,6 +1,6 @@
 extends Node3D
 
-func _init():
+func _init() -> void:
 	if Global.game_mode == Global.MODE.STEAM_MULTIPLAYER:
 		OS.set_environment("SteamAppId", str(Global.APP_ID))
 		OS.set_environment("SteamGameId", str(Global.APP_ID))
@@ -13,13 +13,13 @@ func _process(_delta: float) -> void:
 	if Global.game_mode == Global.MODE.STEAM_MULTIPLAYER:
 		Steam.run_callbacks()
 
-func _on_singleplayer_pressed():
+func _on_singleplayer_pressed() -> void:
 	Global.game_mode = Global.MODE.SINGLEPLAYER
 	$Mode.add_child(preload("res://scenes/singleplayer.tscn").instantiate())
 	$Menu.hide()
 
 
-func _on_multiplayer_pressed():
+func _on_multiplayer_pressed() -> void:
 	Global.game_mode = Global.MODE.MULTIPLAYER
 	$Mode.add_child(preload("res://scenes/multiplayer.tscn").instantiate())
 	$Menu.hide()
