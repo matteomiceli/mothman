@@ -144,11 +144,10 @@ func leave_lobby() -> void:
 	start_button.disabled = true
 
 func _on_start_button_pressed() -> void:
-	# Clients connect to the existing Steam lobby
+	var lobby_host_id: String = Steam.getLobbyData(Global.LOBBY_ID, "host")
 	var peer := SteamMultiplayerPeer.new()
+	#peer.create_host() if str(multiplayer.get_unique_id()) == lobby_host_id else peer.create_client(multiplayer.get_unique_id())
 	multiplayer.multiplayer_peer = peer
-	# Collect final player list
-	var lobby_host_id := Steam.getLobbyData(Global.LOBBY_ID, "host")
 	Global.ACTIVE_PLAYERS = []
 	for member: Dictionary in Global.LOBBY_MEMBERS:
 		var id: int = multiplayer.get_unique_id()
