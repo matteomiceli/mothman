@@ -19,3 +19,7 @@ var LOBBY_ID := 0
 var LOBBY_MEMBERS := []
 var LOBBY_INVITE_ARG := false
 var MAX_LOBBY_PLAYERS := 8
+var IS_HOST := false
+
+func is_server() -> bool:
+	return IS_HOST

@@ -44,7 +44,7 @@ func join_lobby(lobby_id: int) -> void:
 	Global.LOBBY_ID = lobby_id
 	Steam.joinLobby(lobby_id)
 	set_lobby_members()
-
+	
 func set_lobby_members() -> void:
 	Global.LOBBY_MEMBERS.clear()
 	ready_states.clear()
@@ -105,8 +105,7 @@ func _on_lobby_match_list(lobby_ids: Variant) -> void:
 
 func _on_lobby_joined(lobby_id: int, _perm: Variant, _locked: bool, _response: Variant) -> void:
 	Global.LOBBY_ID = lobby_id
-	var name := Steam.getLobbyData(lobby_id, "name")
-	lobby_name_label.text = name
+	lobby_name_label.text = Steam.getLobbyData(lobby_id, "name")
 	set_lobby_members()
 
 func _on_lobby_join_requested(lobby_id: int, friend_id: int) -> void:
@@ -156,6 +155,7 @@ func _on_start_button_pressed() -> void:
 		var name: String = member["steam-name"]
 		var is_ready: bool = ready_states.get(id, false)
 		var is_host := str(id) == lobby_host_id
+		Global.IS_HOST = is_host
 		Global.ACTIVE_PLAYERS.append({"id": id, "name": name, "ready": is_ready, "is_host": is_host})
 
 	print_debug("ACTIVE_PLAYERS:", Global.ACTIVE_PLAYERS)
