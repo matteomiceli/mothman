@@ -8,6 +8,9 @@ extends MultiplayerSynchronizer
 # Actions -- simulate just_pressed, just_released
 @export var jump_pressed := false
 @export var dash_pressed := false
+@export var grab_pressed := false
+@export var grab_released := false
+@export var crouch_pressed := false
 
 func _physics_process(_delta: float) -> void:
 	if not is_multiplayer_authority(): return
@@ -18,8 +21,16 @@ func _physics_process(_delta: float) -> void:
 
 	if Input.is_action_just_pressed("dash"):
 		dash.rpc()
+
+	if Input.is_action_just_pressed("grab"):
+		grab.rpc()
+
+	if Input.is_action_just_released("grab"):
+		grab_release.rpc()
+
+	if Input.is_action_pressed("crouch"):
+		crouch.rpc()
 		
-	# TODO-MM: refactor rest of movement logic under this synchronizer
 
 @rpc("call_local")
 func jump() -> void:
@@ -29,3 +40,16 @@ func jump() -> void:
 @rpc("call_local")
 func dash() -> void:
 	dash_pressed = true
+
+@rpc("call_local")
+func grab() -> void:
+	grab_pressed = true
+
+@rpc("call_local")
+func grab_release() -> void:
+	grab_released = true
+
+
+@rpc("call_local")
+func crouch() -> void:
+	crouch_pressed = true

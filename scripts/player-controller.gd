@@ -113,15 +113,15 @@ func handle_inputs() -> void:
 	if input_synchronizer.jump_pressed:
 		try_jump()
 	if input_synchronizer.dash_pressed and dash_cooldown_timer <= 0.0:
-		print("pressed")
 		start_dash()
-	if Input.is_action_just_pressed("grab") and not is_swinging and swing_anchor:
+	if input_synchronizer.grab_pressed and not is_swinging and swing_anchor:
 		start_swing()
-	if Input.is_action_just_released("grab") and is_swinging:
+	if input_synchronizer.grab_released and is_swinging:
 		release_swing()
 
-	if Input.is_action_pressed("crouch"):
+	if input_synchronizer.crouch_pressed:
 		currAnim = AnimState.CROUCH
+		input_synchronizer.crouch_pressed = false
 
 func try_jump() -> void:
 	if is_on_floor():
@@ -244,6 +244,9 @@ func start_swing() -> void:
 	snap_time = 0.0
 	is_snapping = true
 
+	# reset input
+	input_synchronizer.grab_pressed = false
+
 func handle_swing(delta: float) -> void:
 	var torque := - SWING_ACCEL * sin(swing_angle)
 	swing_speed += torque * delta
@@ -267,6 +270,9 @@ func release_swing() -> void:
 	rotation.z = 0
 	if velocity.length() > 0.1:
 		rotation.y = atan2(-velocity.x, -velocity.z)
+	
+	# reset input
+	input_synchronizer.grab_released = false
 
 func set_swing_anchor(anchor: Node3D) -> void:
 	swing_anchor = anchor
