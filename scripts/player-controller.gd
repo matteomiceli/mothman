@@ -83,9 +83,11 @@ func _ready() -> void:
 	input_synchronizer.set_multiplayer_authority(name.to_int())
 
 func _physics_process(delta: float) -> void:
-	handle_inputs()
 	handle_animations(delta)
+
 	if not multiplayer.is_server(): return
+
+	handle_inputs()
 	handle_dash_cooldown(delta)
 	if is_snapping:
 		handle_snap(delta)
@@ -110,7 +112,8 @@ func handle_snap(delta: float) -> void:
 func handle_inputs() -> void:
 	if input_synchronizer.jump_pressed:
 		try_jump()
-	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0:
+	if input_synchronizer.dash_pressed and dash_cooldown_timer <= 0.0:
+		print("pressed")
 		start_dash()
 	if Input.is_action_just_pressed("grab") and not is_swinging and swing_anchor:
 		start_swing()
@@ -137,7 +140,8 @@ func try_jump() -> void:
 func start_dash() -> void:
 	is_dashing = true
 	dash_cooldown_timer = DASH_COOLDOWN
-	dash_velocity = Vector3(Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left"), 0, Input.get_action_strength("move_back") - Input.get_action_strength("move_forward")).normalized() * DASH_FORCE
+	dash_velocity = Vector3(input_synchronizer.input_dir.x, 0, input_synchronizer.input_dir.y) * DASH_FORCE
+	input_synchronizer.dash_pressed = false
 
 func handle_dash_decay(delta: float) -> void:
 	if is_dashing:
