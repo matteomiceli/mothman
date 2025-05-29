@@ -54,11 +54,21 @@ offset_bottom = 642.0
 
 [node name="Label" type="Label" parent="ServerMenu/ItemList"]
 layout_mode = 0
-offset_left = 28.0
-offset_top = 135.0
-offset_right = 126.0
-offset_bottom = 164.0
+offset_left = 43.0
+offset_top = 145.0
+offset_right = 141.0
+offset_bottom = 174.0
 text = "Server shit:"
+vertical_alignment = 1
+
+[node name="Players" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 813.0
+offset_top = 135.0
+offset_right = 911.0
+offset_bottom = 164.0
+text = "Players:
+"
 vertical_alignment = 1
 
 [node name="Color" type="Label" parent="ServerMenu/ItemList"]

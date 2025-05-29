@@ -29,6 +29,16 @@ offset_bottom = 164.0
 text = "Server shit:"
 vertical_alignment = 1
 
+[node name="Players" type="Label" parent="ServerMenu/ItemList"]
+layout_mode = 0
+offset_left = 817.0
+offset_top = 135.0
+offset_right = 1026.0
+offset_bottom = 184.0
+text = "Players:
+"
+vertical_alignment = 1
+
 [node name="Color" type="Label" parent="ServerMenu/ItemList"]
 layout_mode = 0
 offset_left = 63.0
@@ -82,5 +92,15 @@ offset_right = 390.0
 offset_bottom = 438.0
 text = "Connect"
 
+[node name="StartGame" type="Button" parent="ServerMenu/ItemList"]
+visible = false
+offset_left = 209.0
+offset_top = 298.0
+offset_right = 329.0
+offset_bottom = 339.0
+text = "Start game
+"
+
 [connection signal="pressed" from="ServerMenu/ItemList/host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="ServerMenu/ItemList/client_connect" to="." method="_on_client_pressed"]
+[connection signal="pressed" from="ServerMenu/ItemList/StartGame" to="." method="_on_start_game_pressed"]
