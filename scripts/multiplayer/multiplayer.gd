@@ -3,6 +3,8 @@ extends Node
 @onready var player_color_picker := $ServerMenu/ItemList/PlayerColorPicker
 @onready var world := $World
 
+var players: Dictionary = {}
+
 const PORT = 4433
 
 func _ready() -> void:
@@ -24,16 +26,18 @@ func start_server() -> void:
 func register_listeners() -> void:
 	if not multiplayer.is_server(): return
 
-	multiplayer.peer_connected.connect(add_player)
 	multiplayer.peer_disconnected.connect(world.remove_player)
 
+@rpc("any_peer")
+func register_player(id: int, color: Color) -> void:
+	if multiplayer.is_server(): 
+		players[id] = color
+		add_player(id)
+
 func add_player(id: int) -> void:
-	# This peer's player
-	if id == multiplayer.get_unique_id():
-		world.add_player(id, player_color_picker.color)
-		return
-	
-	world.add_player(id)
+	print("ADDD")
+	var player_color: Variant = players.get(id, Color.WHITE)
+	world.add_player(id, player_color)
 
 func _on_host_pressed() -> void:
 	# Start host
@@ -44,8 +48,7 @@ func _on_host_pressed() -> void:
 		return
 	multiplayer.multiplayer_peer = peer
 
-	# Add server host player
-	world.add_player(multiplayer.get_unique_id(), player_color_picker.color)
+	register_player(1, player_color_picker.color)
 	start_game()
 	
 func _on_client_pressed() -> void:
@@ -62,6 +65,12 @@ func _on_client_pressed() -> void:
 		OS.alert("Failed to connect to client")
 		return
 	multiplayer.multiplayer_peer = peer
+
+	multiplayer.connected_to_server.connect(func() -> void:
+		var my_id: int = multiplayer.get_unique_id()
+		register_player.rpc_id(1, my_id, player_color_picker.color)
+	)
+
 	start_game()
 
 #func _on_countdown_finished():
