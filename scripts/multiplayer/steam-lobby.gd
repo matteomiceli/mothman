@@ -146,7 +146,7 @@ func leave_lobby() -> void:
 func _on_start_button_pressed() -> void:
 	var lobby_host_id: String = Steam.getLobbyData(Global.LOBBY_ID, "host")
 	var peer := SteamMultiplayerPeer.new()
-	#peer.create_host() if str(multiplayer.get_unique_id()) == lobby_host_id else peer.create_client(multiplayer.get_unique_id())
+	#peer.create_host() if str(multiplayer.get_unique_id()) == lobby_host_id else peer.creawate_client(multiplayer.get_unique_id())
 	multiplayer.multiplayer_peer = peer
 	Global.ACTIVE_PLAYERS = []
 	for member: Dictionary in Global.LOBBY_MEMBERS:
