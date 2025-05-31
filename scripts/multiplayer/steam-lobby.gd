@@ -113,7 +113,8 @@ func _on_lobby_join_requested(lobby_id: int, friend_id: int) -> void:
 	join_lobby(lobby_id)
 
 func _on_lobby_data_update(_success: bool, lobby_id: int, member_id: int) -> void:
-	var ready_val := Steam.getLobbyMemberData(lobby_id, member_id, "ready")
+	var key := "ready_%s" % member_id
+	var ready_val := Steam.getLobbyMemberData(lobby_id, member_id, key)
 	ready_states[member_id] = ready_val == "true"
 	update_player_list()
 
@@ -146,16 +147,20 @@ func leave_lobby() -> void:
 func _on_start_button_pressed() -> void:
 	var lobby_host_id: String = Steam.getLobbyData(Global.LOBBY_ID, "host")
 	var peer := SteamMultiplayerPeer.new()
-	#peer.create_host() if str(multiplayer.get_unique_id()) == lobby_host_id else peer.creawate_client(multiplayer.get_unique_id())
+	if Steam.getSteamID() == int(lobby_host_id):
+		peer.create_host(4433)
+	else:
+		peer.create_client(Steam.getSteamID())
+
 	multiplayer.multiplayer_peer = peer
 	Global.ACTIVE_PLAYERS = []
 	for member: Dictionary in Global.LOBBY_MEMBERS:
-		var id: int = multiplayer.get_unique_id()
+		var steam_id: int = Steam.getSteamID()
 		var name: String = member["steam-name"]
-		var is_ready: bool = ready_states.get(id, false)
-		var is_host := str(id) == lobby_host_id
+		var is_ready: bool = ready_states.get(steam_id, false)
+		var is_host := str(steam_id) == lobby_host_id
 		Global.IS_HOST = is_host
-		Global.ACTIVE_PLAYERS.append({"id": id, "name": name, "ready": is_ready, "is_host": is_host})
+		Global.ACTIVE_PLAYERS.append({"steam_id": steam_id, "name": name, "ready": is_ready, "is_host": is_host})
 
 	print_debug("ACTIVE_PLAYERS:", Global.ACTIVE_PLAYERS)
 	get_tree().change_scene_to_file("res://scenes/world.tscn")
@@ -170,10 +175,9 @@ func _on_leave_button_pressed() -> void: leave_lobby()
 func _on_send_button_pressed() -> void: send_chat_message()
 func _on_close_button_pressed() -> void: lobby_popup.hide()
 func _on_ready_button_pressed() -> void:
-	var self_id := Steam.getSteamID()
-	var is_ready: bool = !ready_states.get(self_id, false)
-	Steam.setLobbyMemberData(Global.LOBBY_ID, "ready", str(is_ready))
-	ready_states[self_id] = is_ready
+	var is_ready: bool = !ready_states.get(Steam.getSteamID(), false)
+	Steam.setLobbyMemberData(Global.LOBBY_ID, "ready_%s" % Steam.getSteamID(), str(is_ready))
+	ready_states[Steam.getSteamID()] = is_ready
 	update_player_list()
 
 func check_command_line() -> void:
