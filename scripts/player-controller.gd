@@ -112,15 +112,30 @@ func handle_snap(delta: float) -> void:
 func handle_inputs() -> void:
 	if input_synchronizer.jump_pressed:
 		try_jump()
-	if input_synchronizer.dash_pressed and dash_cooldown_timer <= 0.0:
-		start_dash()
-	if input_synchronizer.grab_pressed and not is_swinging and swing_anchor:
-		start_swing()
-	if input_synchronizer.grab_released and is_swinging:
-		release_swing()
+		#reset
+		input_synchronizer.jump_pressed = false
+
+	if input_synchronizer.dash_pressed: 
+		if dash_cooldown_timer <= 0.0:
+			start_dash()
+		# reset
+		input_synchronizer.dash_pressed = false
+
+	if input_synchronizer.grab_pressed:
+		if not is_swinging and swing_anchor:
+			start_swing()
+		# reset 
+		input_synchronizer.grab_pressed = false
+
+	if input_synchronizer.grab_released:
+		if is_swinging:
+			release_swing()
+		# reset
+		input_synchronizer.grab_released = false
 
 	if input_synchronizer.crouch_pressed:
 		currAnim = AnimState.CROUCH
+		# reset
 		input_synchronizer.crouch_pressed = false
 
 func try_jump() -> void:
@@ -133,9 +148,6 @@ func try_jump() -> void:
 		stop_wall_run()
 		velocity = (Vector3.UP + wall_normal * 0.5).normalized() * JUMP_VELOCITY
 		fire_jump_animation.rpc()
-
- 	# reset action state on player input
-	input_synchronizer.jump_pressed = false
 
 func start_dash() -> void:
 	is_dashing = true
@@ -244,9 +256,6 @@ func start_swing() -> void:
 	snap_time = 0.0
 	is_snapping = true
 
-	# reset input
-	input_synchronizer.grab_pressed = false
-
 func handle_swing(delta: float) -> void:
 	var torque := - SWING_ACCEL * sin(swing_angle)
 	swing_speed += torque * delta
@@ -270,9 +279,6 @@ func release_swing() -> void:
 	rotation.z = 0
 	if velocity.length() > 0.1:
 		rotation.y = atan2(-velocity.x, -velocity.z)
-	
-	# reset input
-	input_synchronizer.grab_released = false
 
 func set_swing_anchor(anchor: Node3D) -> void:
 	swing_anchor = anchor
