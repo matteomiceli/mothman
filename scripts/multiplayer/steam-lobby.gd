@@ -168,9 +168,9 @@ func _on_text_edit_text_changed() -> void:
 
 func _on_start_button_pressed() -> void:
 	# Only host should ever be able to press this, but double-check
-	var my_id := Steam.getSteamID()
-	var host_id := int(Steam.getLobbyData(lobby_manager.lobby_id, "host"))
-	if my_id != host_id:
+	var my_steam_id := Steam.getSteamID()
+	var host_steam_id := int(Steam.getLobbyData(lobby_manager.lobby_id, "host"))
+	if my_steam_id != host_steam_id:
 		return  # Not host, ignore
 		
 	for member: Dictionary in lobby_manager.members:

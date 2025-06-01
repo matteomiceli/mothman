@@ -11,7 +11,7 @@ func _ready() -> void:
 			var steam_id: int = active_player.get("steam_id", -1)
 			var steam_name: String = active_player.get("steam_name", "")
 			var peer_id: int = active_player.get("peer_id", -1)
-			var color: Color = active_player.get("color", Color(0,0,0))  # optional if you store color
+			var color: Color = active_player.get("color", Color.BLACK)
 			steam_add_player(steam_id, steam_name, peer_id, color)
 
 func steam_add_player(steam_id: int, steam_name: String, peer_id: int, color: Color) -> void:
