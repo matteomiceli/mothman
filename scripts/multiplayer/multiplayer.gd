@@ -71,7 +71,6 @@ func start_game() -> void:
 	$ServerMenu.hide()
 	get_tree().paused = false
 
-
 func _exit_tree() -> void:
 	# Cleanup listeners
 	if not multiplayer.is_server(): return 

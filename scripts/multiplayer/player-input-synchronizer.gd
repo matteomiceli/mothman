@@ -36,7 +36,6 @@ func _physics_process(_delta: float) -> void:
 func jump() -> void:
 	jump_pressed = true
 
-
 @rpc("call_local")
 func dash() -> void:
 	dash_pressed = true
@@ -48,7 +47,6 @@ func grab() -> void:
 @rpc("call_local")
 func grab_release() -> void:
 	grab_released = true
-
 
 @rpc("call_local")
 func crouch() -> void:
