@@ -5,13 +5,18 @@ enum LobbyStatus { Private, Friends, Public, Invisible }
 @onready var lobby_manager: Node = preload("res://scripts/multiplayer/lobby-manager.gd").new()
 @onready var chat_manager: Node = preload("res://scripts/multiplayer/chat-manager.gd").new()
 
+@onready var lobby_name_input := $CreateButton/TextEdit
 @onready var steam_name_label := $SteamName
 @onready var chat_button := $SendButton
 @onready var chat_input := $SendButton/TextEdit
 @onready var chat_output := $Chat/RichTextLabel
+@onready var chat_label := $Chat/Label
+@onready var player_list_label := $Players/Label 
 @onready var player_list_output := $Players/RichTextLabel
 @onready var ready_button := $ReadyButton
 @onready var start_button := $StartButton
+@onready var leave_button := $LeaveButton
+@onready var create_button := $CreateButton
 @onready var lobby_list_popup := $Popup
 @onready var lobby_list_container := $Popup/Panel/Scroll/VBox
 
@@ -20,7 +25,6 @@ func _ready() -> void:
 	add_child(chat_manager)
 	steam_name_label.text = Global.STEAM_NAME
 
-	# Connect signals from managers to UI
 	lobby_manager.members_updated.connect(_on_members_updated)
 	lobby_manager.ready_states_updated.connect(_on_ready_states_updated)
 	lobby_manager.lobby_created.connect(_on_lobby_created)
@@ -37,13 +41,15 @@ func _ready() -> void:
 	Steam.lobby_match_list.connect(_steam_lobby_match_list)
 
 	ready_button.pressed.connect(_on_ready_button_pressed)
-	
 	chat_input.editable = false
 	chat_button.disabled = true
+	leave_button.disabled = true
+	ready_button.disabled = true
+	create_button.disabled = true
 	
 func _on_members_updated(members: Array) -> void:
-	# Update player list UI
 	player_list_output.clear()
+	player_list_label.text = "Players (%d)" % members.size()
 	for member: Dictionary in members:
 		player_list_output.append_text("%s\n" % member["steam-name"])
 
@@ -71,21 +77,29 @@ func _on_lobby_created(success: int, lobby_id: int) -> void:
 		chat_button.disabled = false
 		chat_input.editable = true
 		chat_input.clear()
+		leave_button.disabled = false
+		ready_button.disabled = false
 	else:
 		display_message("Failed to create lobby.")
 
 func _on_lobby_joined(lobby_id: int) -> void:
-	display_message("Joined lobby %d" % lobby_id)
+	chat_output.clear()
+	display_message("Joined lobby %s" % Steam.getLobbyData(lobby_id, "name"))
 	lobby_manager.set_lobby_members()
+	chat_label.text = Steam.getLobbyData(lobby_id, "name")
 	chat_button.disabled = false
 	chat_input.editable = true
 	chat_input.clear()
-
+	leave_button.disabled = false
+	ready_button.disabled = false
+	
 func _on_lobby_left() -> void:
-	display_message("Left lobby.")
 	chat_button.disabled = true
 	chat_input.editable = false
 	chat_input.clear()
+	chat_output.clear()
+	leave_button.disabled = true
+	ready_button.disabled = true
 	
 func _on_message_received(user_id: int, message: String) -> void:
 	if lobby_manager.lobby_id != 0:
@@ -102,7 +116,7 @@ func _steam_lobby_joined(lobby_id: int, _perm: Variant, _locked: bool, _response
 	lobby_manager.handle_lobby_joined(lobby_id)
 
 func _steam_lobby_data_update(_success: bool, lobby_id: int, member_id: int) -> void:
-	lobby_manager.update_ready_from_lobby_data(member_id)
+	lobby_manager.handle_lobby_data_update(member_id)
 
 func _steam_lobby_message(_result: Variant, user_id: int, message: String, _type: String) -> void:
 	chat_manager.receive_message(user_id, message)
@@ -119,6 +133,7 @@ func _steam_lobby_match_list(lobby_ids: Array) -> void:
 		btn.pressed.connect(func() -> void:
 			lobby_manager.join_lobby(lobby_id)
 			lobby_list_popup.hide()
+			chat_input.clear()
 		)
 		lobby_list_container.add_child(btn)
 
@@ -126,13 +141,16 @@ func display_message(message: String) -> void:
 	chat_output.add_text("\n%s" % message)
 
 func _on_create_button_pressed() -> void:
-	lobby_manager.create_lobby(LobbyStatus.Public, Global.MAX_LOBBY_PLAYERS)
+	lobby_manager.create_lobby(LobbyStatus.Public, Global.MAX_LOBBY_PLAYERS, lobby_name_input.text)
+	lobby_name_input.clear()
 
-func _on_join_button_pressed(lobby_id: int) -> void:
-	lobby_manager.join_lobby(lobby_id)
+func _on_browse_button_pressed() -> void:
+	lobby_list_popup.popup()  # Open the lobby browser popup
+	Steam.requestLobbyList()  # Triggers _steam_lobby_match_list when done
 
 func _on_leave_button_pressed() -> void:
 	lobby_manager.leave_lobby()
+	chat_label.text = ""
 
 func _on_send_button_pressed() -> void:
 	chat_manager.send_message(lobby_manager.lobby_id, chat_input.text)
@@ -144,6 +162,12 @@ func _on_ready_button_pressed() -> void:
 	var key := "ready_%s" % my_id
 	Steam.setLobbyMemberData(lobby_manager.lobby_id, key, str(is_ready))
 	lobby_manager.set_ready_state(my_id, is_ready)
+
+func _on_close_button_pressed() -> void:
+	lobby_list_popup.hide()
+
+func _on_text_edit_text_changed() -> void:
+	create_button.disabled = lobby_name_input.text.is_empty()
 
 func _on_start_button_pressed() -> void:
 	# Only host should ever be able to press this, but double-check

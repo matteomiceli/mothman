@@ -67,37 +67,29 @@ text = "Start Game
 "
 
 [node name="CreateButton" type="Button" parent="."]
-offset_left = 4.0
-offset_top = -2.99999
-offset_right = 115.0
-offset_bottom = 28.0
+offset_left = 16.0
+offset_top = 11.0
+offset_right = 127.0
+offset_bottom = 42.0
 scale = Vector2(2.69961, 2.68139)
 text = "Create Lobby
 "
 
 [node name="TextEdit" type="TextEdit" parent="CreateButton"]
 layout_mode = 0
-offset_left = 116.0
-offset_top = 16.0
-offset_right = 276.0
-offset_bottom = 53.0
+offset_left = 119.647
+offset_top = -1.49176
+offset_right = 379.647
+offset_bottom = 62.5082
+scale = Vector2(0.540675, 0.477883)
 
-[node name="Label" type="Label" parent="CreateButton"]
-layout_mode = 0
-offset_left = 117.054
-offset_top = 2.61059
-offset_right = 215.054
-offset_bottom = 25.6106
-scale = Vector2(1, 0.656894)
-text = "Lobby Name"
-
-[node name="JoinButton" type="Button" parent="."]
-offset_left = 142.0
-offset_top = 87.0
-offset_right = 231.0
-offset_bottom = 118.0
+[node name="BrowseButton" type="Button" parent="."]
+offset_left = 74.0
+offset_top = 98.0
+offset_right = 204.0
+offset_bottom = 129.0
 scale = Vector2(1.81291, 1.84139)
-text = "Join Lobby
+text = "Browse Lobbies
 "
 
 [node name="ReadyButton" type="Button" parent="."]
@@ -181,8 +173,9 @@ layout_mode = 2
 
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="CreateButton" to="." method="_on_create_button_pressed"]
-[connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
+[connection signal="text_changed" from="CreateButton/TextEdit" to="." method="_on_text_edit_text_changed"]
+[connection signal="pressed" from="BrowseButton" to="." method="_on_browse_button_pressed"]
 [connection signal="pressed" from="ReadyButton" to="." method="_on_ready_button_pressed"]
 [connection signal="pressed" from="LeaveButton" to="." method="_on_leave_button_pressed"]
 [connection signal="pressed" from="SendButton" to="." method="_on_send_button_pressed"]
-[connection signal="pressed" from="Popup/Panel/Close" to="." method="_on_close_pressed"]
+[connection signal="button_up" from="Popup/Panel/Close" to="." method="_on_close_button_pressed"]
