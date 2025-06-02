@@ -24,7 +24,7 @@ func _ready() -> void:
 	add_child(chat_manager)
 	steam_name_label.text = Global.STEAM_NAME
 
-	lobby_manager.members_updated.connect(_on_members_updated)
+	lobby_manager.members_updated.connect(_on_members_updated.rpc)
 	lobby_manager.ready_states_updated.connect(_on_ready_states_updated)
 	lobby_manager.lobby_created.connect(_on_lobby_created)
 	lobby_manager.lobby_joined.connect(_on_lobby_joined)
@@ -44,7 +44,8 @@ func _ready() -> void:
 	leave_button.disabled = true
 	ready_button.disabled = true
 	create_button.disabled = true
-	
+
+@rpc("call_local")
 func _on_members_updated(members: Array) -> void:
 	player_list_output.clear()
 	player_list_label.text = "Players (%d)" % members.size()

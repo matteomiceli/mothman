@@ -16,7 +16,6 @@ var ONLINE := false
 var STEAM_ID := 0
 var STEAM_NAME := ""
 var LOBBY_ID := 0
-var LOBBY_MEMBERS := []
 var LOBBY_INVITE_ARG := false
 var MAX_LOBBY_PLAYERS := 8
 var IS_HOST := false

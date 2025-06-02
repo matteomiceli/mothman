@@ -94,6 +94,7 @@ text = "Connect"
 
 [node name="StartGame" type="Button" parent="ServerMenu/ItemList"]
 visible = false
+layout_mode = 0
 offset_left = 209.0
 offset_top = 298.0
 offset_right = 329.0
