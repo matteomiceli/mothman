@@ -165,9 +165,8 @@ func _on_start_button_pressed() -> void:
 	NetworkManager.rpc("sync_active_players", Global.ACTIVE_PLAYERS)
 	
 	print("Ready to plunder...")
-	go_to_world_scene()
 	go_to_world_scene.rpc()
 
-@rpc("any_peer")
+@rpc("call_local")
 func go_to_world_scene() -> void:
 	get_tree().change_scene_to_file("res://scenes/world.tscn")
