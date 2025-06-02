@@ -55,7 +55,6 @@ func _on_lobby_list_updated(lobbies: Array) -> void:
 		)
 		lobby_list_container.add_child(btn)
 
-
 @rpc("call_local")
 func _on_members_updated(members: Array) -> void:
 	player_list_output.clear()
@@ -83,7 +82,6 @@ func _on_ready_states_updated(ready_states: Dictionary) -> void:
 
 func _on_lobby_created(success: int, lobby_id: int) -> void:
 	if success == 1:
-		display_message("Lobby created!")
 		chat_button.disabled = false
 		chat_input.editable = true
 		chat_input.clear()
@@ -112,13 +110,12 @@ func _on_lobby_left() -> void:
 	leave_button.disabled = true
 	ready_button.disabled = true
 	
-func _on_message_received(user_id: int, message: String) -> void:
+func _on_message_received(steam_name: String, message: String) -> void:
 	if lobby_backend.lobby_id != 0:
-		var name := Steam.getFriendPersonaName(user_id)
-		chat_output.add_text("\n%s: %s" % [name, message])
+		chat_output.add_text("\n%s: %s" % [steam_name, message])
 
-func _on_message_sent(user_id: int, message: String) -> void:
-	_on_message_received(user_id, message)
+func _on_message_sent(steam_name: String, message: String) -> void:
+	_on_message_received(steam_name, message)
 
 func display_message(message: String) -> void:
 	chat_output.add_text("\n%s" % message)
@@ -132,7 +129,7 @@ func _on_create_button_pressed() -> void:
 
 func _on_browse_button_pressed() -> void:
 	lobby_list_popup.popup()
-	lobby_backend.request_lobby_list()
+	lobby_backend.get_lobby_list()
 
 func _on_leave_button_pressed() -> void:
 	lobby_backend.leave_lobby()
@@ -143,7 +140,7 @@ func _on_send_button_pressed() -> void:
 	chat_input.text = ""
 
 func _on_ready_button_pressed() -> void:
-	lobby_backend.set_ready_states()
+	lobby_backend.toggle_ready()
 
 func _on_close_button_pressed() -> void:
 	lobby_list_popup.hide()
@@ -154,7 +151,8 @@ func _on_start_button_pressed() -> void:
 	var host_steam_id := int(Steam.getLobbyData(lobby_backend.lobby_id, "host"))
 	if my_steam_id != host_steam_id:
 		return  # Not host, ignore
-		
+	
+	var new_active_players := []
 	for member: Dictionary in lobby_backend.members:
 		var player_info := {
 			"steam_id": member.get("steam_id", 0),
@@ -162,9 +160,14 @@ func _on_start_button_pressed() -> void:
 			"hoody_color": Color(0,0,0),
 			"peer_id": NetworkManager.steam_to_peer[member.get("steam_id")]
 		}
-		Global.ACTIVE_PLAYERS.append(player_info)
-
+		new_active_players.append(player_info)
+	Global.ACTIVE_PLAYERS = new_active_players
 	NetworkManager.rpc("sync_active_players", Global.ACTIVE_PLAYERS)
 	
 	print("Ready to plunder...")
+	go_to_world_scene()
+	go_to_world_scene.rpc()
+
+@rpc("any_peer")
+func go_to_world_scene() -> void:
 	get_tree().change_scene_to_file("res://scenes/world.tscn")

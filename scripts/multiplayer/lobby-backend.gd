@@ -1,4 +1,3 @@
-# lobby-manager.gd
 extends Node
 
 signal members_updated(members: Array)
@@ -11,41 +10,59 @@ signal lobby_list_updated(lobbies: Array)
 var lobby_id := 0
 var pending_lobby_name := ""
 
+#region state
 var _members := []
-@export var members: Array:
+var members: Array:
 	get: return _members
 	set(value):
 		_members = value
 		emit_signal("members_updated", _members)
 		if multiplayer.is_server():
 			rpc("sync_members", _members)
-@rpc("authority")
+@rpc("any_peer")
 func sync_members(members_: Array) -> void:
 	members = members_
-	
+
 var _ready_states := {}
-@export var ready_states: Dictionary:
+var ready_states: Dictionary:
 	get: return _ready_states
 	set(value):
 		_ready_states = value
 		emit_signal("ready_states_updated", _ready_states)
 		if multiplayer.is_server():
 			rpc("sync_ready_states", _ready_states)
-@rpc("authority")
+@rpc("any_peer")
 func sync_ready_states(ready_states_: Dictionary) -> void:
 	ready_states = ready_states_
-
-func _ready() -> void:
-	Steam.lobby_created.connect(_on_steam_lobby_created)
-	Steam.lobby_joined.connect(_on_steam_lobby_joined)
-	Steam.lobby_data_update.connect(_on_steam_lobby_data_update)
-	Steam.lobby_match_list.connect(_on_steam_lobby_match_list)
-
+	
 func get_lobby_name() -> String:
 	return Steam.getLobbyData(lobby_id, "lobby_name")
 
 func get_host_id() -> int:
 	return int(Steam.getLobbyData(lobby_id, "host"))
+	
+func get_lobby_list() -> void:
+	Steam.requestLobbyList()
+#endregion
+
+func toggle_ready() -> void:
+	var steam_id := Steam.getSteamID()
+	if multiplayer.is_server():
+		request_toggle_ready(steam_id)
+	else:
+		rpc_id(1, "request_toggle_ready", steam_id)
+
+@rpc("authority")
+func request_toggle_ready(steam_id: int) -> void:
+	if multiplayer.is_server():
+		var new_states := ready_states.duplicate()
+		new_states[steam_id] = !ready_states.get(steam_id, false)
+		ready_states = new_states
+		
+func _ready() -> void:
+	Steam.lobby_created.connect(_on_steam_lobby_created)
+	Steam.lobby_joined.connect(_on_steam_lobby_joined)
+	Steam.lobby_match_list.connect(_on_steam_lobby_match_list)
 
 func create_lobby(status: int, max_players: int, lobby_name: String) -> void:
 	pending_lobby_name = lobby_name
@@ -66,29 +83,18 @@ func leave_lobby() -> void:
 func set_lobby_members() -> void:
 	var new_members := []
 	var new_ready_states := {}
+	var new_teams := {}
+	var new_names := {}
 	var count := Steam.getNumLobbyMembers(lobby_id)
 	for i in count:
 		var steam_id := Steam.getLobbyMemberByIndex(lobby_id, i)
 		var steam_name := Steam.getFriendPersonaName(steam_id)
 		new_members.append({ "steam_id": steam_id, "steam_name": steam_name })
 		new_ready_states[steam_id] = false
+		new_teams[steam_id] = 0
+		new_names[steam_id] = steam_name
 	members = new_members
 	ready_states = new_ready_states
-
-func set_ready_states() -> void:
-	var steam_id := Steam.getSteamID()
-	var is_ready: bool = !ready_states.get(steam_id, false)
-	var key := "ready_%s" % steam_id
-	Steam.setLobbyMemberData(lobby_id, key, str(is_ready))
-	
-	var new_ready_states := ready_states.duplicate()
-	new_ready_states[steam_id] = is_ready
-	ready_states = new_ready_states
-
-func handle_lobby_data_update(member_id: int) -> void:
-	var key := "ready_%s" % member_id
-	var ready_val := Steam.getLobbyMemberData(lobby_id, member_id, key)
-	ready_states[member_id] = ready_val == "true"
 
 func handle_lobby_created(success: int, lobby_id_: int) -> void:
 	if success == 1:
@@ -112,17 +118,11 @@ func handle_lobby_joined(lobby_id_: int) -> void:
 	NetworkManager.announce_my_id()
 	emit_signal("lobby_joined", lobby_id_)
 
-func request_lobby_list() -> void:
-	Steam.requestLobbyList()
-
 func _on_steam_lobby_created(success: int, lobby_id: int) -> void:
 	handle_lobby_created(success, lobby_id)
 
 func _on_steam_lobby_joined(lobby_id: int, _perm: Variant, _locked: bool, _response: Variant) -> void:
 	handle_lobby_joined(lobby_id)
-
-func _on_steam_lobby_data_update(_success: bool, lobby_id: int, member_id: int) -> void:
-	handle_lobby_data_update(member_id)
 
 func _on_steam_lobby_match_list(lobby_ids: Array) -> void:
 	var lobbies := []
