@@ -9,6 +9,8 @@ extends CharacterBody3D
 
 @onready var input_synchronizer := $Sync/InputSynchronizer
 
+@export var device_index: int = 0
+
 # Audio
 const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
 var footstep_timer := 0.0

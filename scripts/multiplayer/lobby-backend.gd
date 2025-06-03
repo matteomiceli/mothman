@@ -38,7 +38,7 @@ func sync_ready_states(ready_states_: Dictionary) -> void:
 func get_lobby_name() -> String:
 	return Steam.getLobbyData(lobby_id, "lobby_name")
 
-func get_host_id() -> int:
+func get_host_steam_id() -> int:
 	return int(Steam.getLobbyData(lobby_id, "host"))
 	
 func get_lobby_list() -> void:
