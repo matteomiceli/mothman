@@ -16,7 +16,7 @@ const FOOTSTEP_INTERVAL := 0.35 # seconds between steps
 var footstep_timer := 0.0
 
 # Customization
-@export var hoody_color: Color = Color(1,1,1)
+@export var hoody_color: Color = Color.YELLOW
 
 # Player
 const MOVE_SPEED := 6

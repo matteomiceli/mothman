@@ -3,6 +3,7 @@ extends Node
 @onready var player_color_picker := $ServerMenu/ItemList/PlayerColorPicker
 @onready var player_list_element: Label = $ServerMenu/ItemList/Players
 @onready var start_game_btn := $ServerMenu/ItemList/StartGame
+@onready var spawner := $World/PlayersSpawn
 
 @onready var world := $World
 
@@ -36,20 +37,26 @@ func register_listeners() -> void:
 func register_player(id: int, color: Color) -> void:
 	if multiplayer.is_server(): 
 		players[id] = color
-		update_player_list.rpc(players)
 		add_player(id)
+		update_player_list.rpc(players)
 
 func add_player(id: int) -> void:
-	var player_color: Variant = players.get(id, Color.WHITE)
+	var player_color: Variant = players.get(id, Color.RED)
 	world.add_player(id, player_color)
 
 @rpc("call_local")
 func update_player_list(players_list: Dictionary) -> void:
 	# reset
+	players = players_list
 	player_list_element.text = "Players:\n"
 
 	for player: int in players_list.keys():
 		player_list_element.text += "%s\n" % player
+
+	for player: Node in spawner.get_children():
+		var player_color: Variant = players.get(int(player.name), Color.RED)
+		player.hoody_color = player_color
+		player.apply_character_customization()
 
 func _on_host_pressed() -> void:
 	# Start host
