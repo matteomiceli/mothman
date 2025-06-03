@@ -108,15 +108,32 @@ func handle_lobby_created(success: int, lobby_id_: int) -> void:
 func handle_lobby_joined(lobby_id_: int) -> void:
 	lobby_id = lobby_id_
 	var steam_peer := SteamMultiplayerPeer.new()
-	var host_id := int(Steam.getLobbyData(lobby_id, "host"))
+	var host_id := Steam.getLobbyOwner(lobby_id)
 	var my_steam_id := Steam.getSteamID()
+
 	if my_steam_id == host_id:
-		steam_peer.create_host(0)
+		# Host can set peer and immediately proceed.
+		var result := steam_peer.create_host(0)
+		if result != OK:
+			push_error("Host failed to create SteamMultiplayerPeer!")
+			return
+		multiplayer.multiplayer_peer = steam_peer
+		NetworkManager.announce_my_id()
+		emit_signal("lobby_joined", lobby_id_)
 	else:
-		steam_peer.create_client(host_id, 0)
-	multiplayer.multiplayer_peer = steam_peer
-	NetworkManager.announce_my_id()
-	emit_signal("lobby_joined", lobby_id_)
+		multiplayer.connected_to_server.connect(
+			func() -> void:
+				print("connected")
+				NetworkManager.announce_my_id()
+				emit_signal("lobby_joined", lobby_id_)
+		)
+		var result := steam_peer.create_client(host_id, 0)
+		if result != OK:
+			push_error("Client failed to create SteamMultiplayerPeer!")
+			return
+
+		multiplayer.multiplayer_peer = steam_peer  # triggers connection and fires signal when ready
+
 
 func _on_steam_lobby_created(success: int, lobby_id: int) -> void:
 	handle_lobby_created(success, lobby_id)

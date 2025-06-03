@@ -169,4 +169,5 @@ func _on_start_button_pressed() -> void:
 
 @rpc("call_local")
 func go_to_world_scene() -> void:
+	print('in')
 	get_tree().change_scene_to_file("res://scenes/world.tscn")
