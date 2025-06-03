@@ -6,6 +6,8 @@ extends CharacterBody3D
 @onready var anim_tree := $PlayerModel/AnimationTree
 @onready var dash_bar := get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
 @onready var hoody_mesh: MeshInstance3D = $PlayerModel/Armature/Skeleton3D/Hoody
+@onready var skeleton: Skeleton3D = $PlayerModel/Armature/Skeleton3D # Adjust path to your skeleton
+const RIGHT_ARM_BONE := "mixamorig10_RightArm"
 
 @onready var input_synchronizer := $Sync/InputSynchronizer
 
@@ -83,10 +85,12 @@ func _ready() -> void:
 	Global.emit_signal("player_spawned", self)
 	apply_character_customization()
 	input_synchronizer.set_multiplayer_authority(name.to_int())
+	add_to_group("players")
 
 func _physics_process(delta: float) -> void:
 	handle_animations(delta)
-
+	handle_right_arm_extension(delta)
+	
 	if not multiplayer.is_server(): return
 
 	handle_inputs()
@@ -104,6 +108,16 @@ func _physics_process(delta: float) -> void:
 		handle_footsteps(delta)
 		move_and_slide()
 
+func handle_right_arm_extension(delta: float) -> void:
+	if Input.is_action_pressed("tag"):
+		var target := get_closest_other_character()
+		if target and skeleton:
+			point_right_arm_at(target.global_position)
+		else:
+			reset_right_arm()
+	else:
+		reset_right_arm()
+		
 func handle_snap(delta: float) -> void:
 	snap_time += delta
 	var t: float = clamp(snap_time / snap_duration, 0.0, 1.0)
@@ -275,7 +289,7 @@ func release_swing() -> void:
 	is_swinging = false
 	var radial := (global_position - swing_anchor.global_position).normalized()
 	var tangent := swing_plane_normal.cross(radial).normalized()
-	velocity = tangent * swing_speed * swing_radius
+	velocity = tangent * swing_speed * swing_radius + Vector3.UP * 2.0
 	swing_anchor = null
 	rotation.x = 0
 	rotation.z = 0
@@ -322,6 +336,37 @@ func update_animation_blend_values() -> void:
 	anim_tree.set("parameters/to_dash/blend_amount", dash_val)
 	anim_tree.set("parameters/to_wallrun/blend_amount", wallrun_val)
 	anim_tree.set("parameters/to_falling/blend_amount", falling_val)
+
+func get_closest_other_character() -> CharacterBody3D:
+	var closest: CharacterBody3D = null
+	var closest_dist := INF
+	for player in get_tree().get_nodes_in_group("players"): # Add all CharacterBody3D to 'players' group
+		if player == self:
+			continue
+		var dist := global_position.distance_to(player.global_position)
+		if dist < closest_dist:
+			closest = player
+			closest_dist = dist
+	return closest
+	
+func point_right_arm_at(target_pos: Vector3) -> void:
+	var bone_idx := skeleton.find_bone(RIGHT_ARM_BONE)
+	if bone_idx == -1:
+		return
+	var arm_pos := skeleton.global_transform.origin
+	var to_target := (target_pos - arm_pos).normalized()
+	var arm_basis := skeleton.global_transform.basis
+
+	# Calculate the rotation to point along to_target, relative to arm's local space
+	var bone_transform := skeleton.get_bone_global_pose(bone_idx)
+	bone_transform = bone_transform.looking_at(target_pos, Vector3.UP)
+	skeleton.set_bone_global_pose_override(bone_idx, bone_transform, 1.0, true)
+
+func reset_right_arm() -> void:
+	var bone_idx := skeleton.find_bone(RIGHT_ARM_BONE)
+	if bone_idx == -1:
+		return
+	skeleton.set_bone_global_pose_override(bone_idx, Transform3D(), 0.0, true)
 
 func play_footstep() -> void:
 	if footstep_sounds.size() > 0:
