@@ -12,6 +12,7 @@ extends MultiplayerSynchronizer
 @export var grab_released := false
 @export var crouch_pressed := false
 @export var tag_pressed := false
+@export var tag_released := false
 
 func _physics_process(_delta: float) -> void:
 	if not is_multiplayer_authority(): return
@@ -33,7 +34,10 @@ func _physics_process(_delta: float) -> void:
 		crouch.rpc()
 	
 	if Input.is_action_pressed("tag"):
-		tag.rpc()	
+		tag.rpc()
+	
+	if Input.is_action_just_released("tag"):
+		tag_release.rpc()	
 
 @rpc("call_local")
 func jump() -> void:
@@ -58,3 +62,7 @@ func crouch() -> void:
 @rpc("call_local")
 func tag() -> void:
 	tag_pressed = true
+
+@rpc("call_local")
+func tag_release() -> void:
+	tag_released = true

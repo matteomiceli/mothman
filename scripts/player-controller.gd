@@ -89,7 +89,6 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	handle_animations(delta)
-	handle_right_arm_extension(delta)
 	
 	if not multiplayer.is_server(): return
 
@@ -108,16 +107,6 @@ func _physics_process(delta: float) -> void:
 		handle_footsteps(delta)
 		move_and_slide()
 
-func handle_right_arm_extension(delta: float) -> void:
-	if Input.is_action_pressed("tag"):
-		var target := get_closest_other_character()
-		if target and skeleton:
-			point_right_arm_at(target.global_position)
-		else:
-			reset_right_arm()
-	else:
-		reset_right_arm()
-		
 func handle_snap(delta: float) -> void:
 	snap_time += delta
 	var t: float = clamp(snap_time / snap_duration, 0.0, 1.0)
@@ -128,31 +117,39 @@ func handle_snap(delta: float) -> void:
 func handle_inputs() -> void:
 	if input_synchronizer.jump_pressed:
 		try_jump()
-		#reset
 		input_synchronizer.jump_pressed = false
 
 	if input_synchronizer.dash_pressed: 
 		if dash_cooldown_timer <= 0.0:
 			start_dash()
-		# reset
 		input_synchronizer.dash_pressed = false
 
 	if input_synchronizer.grab_pressed:
 		if not is_swinging and swing_anchor:
 			start_swing()
-		# reset 
 		input_synchronizer.grab_pressed = false
 
 	if input_synchronizer.grab_released:
 		if is_swinging:
 			release_swing()
-		# reset
 		input_synchronizer.grab_released = false
 
 	if input_synchronizer.crouch_pressed:
 		currAnim = AnimState.CROUCH
-		# reset
 		input_synchronizer.crouch_pressed = false
+	
+	if input_synchronizer.tag_pressed:
+		var target := get_closest_other_character()
+		if target and skeleton:
+			point_right_arm_at(target.global_position)
+		else:
+			reset_right_arm()
+		input_synchronizer.tag_pressed = false
+	elif input_synchronizer.tag_released:
+		reset_right_arm()
+		input_synchronizer.tag_released = false
+	else:
+		reset_right_arm()
 
 func try_jump() -> void:
 	if is_on_floor():
