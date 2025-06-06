@@ -250,7 +250,7 @@ func handle_movement(delta: float) -> void:
 
 func start_swing() -> void:
 	is_swinging = true
-	currAnim = AnimState.IDLE
+	currAnim = AnimState.HANGING
 	var offset := global_position - swing_anchor.global_position
 	var bar_axis := Vector3(1, 0, 0)
 	var x_offset := bar_axis * offset.dot(bar_axis)
