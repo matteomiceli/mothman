@@ -140,16 +140,16 @@ func handle_inputs() -> void:
 
 	if input_synchronizer.tag_pressed:
 		var target := get_closest_other_character()
-		if target and skeleton:
-			point_right_arm_at.rpc(target.global_position)
+		if target:
+			point_arm_at_target(target.global_position)
 		else:
 			reset_right_arm.rpc()
+			reset_left_arm.rpc()
 		input_synchronizer.tag_pressed = false
 	elif input_synchronizer.tag_released:
 		reset_right_arm.rpc()
+		reset_left_arm.rpc()
 		input_synchronizer.tag_released = false
-	else:
-		reset_right_arm.rpc()
 
 func try_jump() -> void:
 	if is_on_floor():
@@ -354,27 +354,36 @@ func get_closest_other_character() -> CharacterBody3D:
 			closest_dist = dist
 	return closest
 
+func point_arm_at_target(target_pos: Vector3) -> void:
+	var to_target := (target_pos - global_transform.origin).normalized()
+	var right_dir := global_transform.basis.x.normalized()
+	var side := right_dir.dot(to_target)
+
+	if side > 0:
+		point_right_arm_at.rpc(target_pos)
+		reset_left_arm.rpc()
+	else:
+		point_left_arm_at.rpc(target_pos)
+		reset_right_arm.rpc()
+
 @rpc("call_local")
 func point_right_arm_at(target_pos: Vector3) -> void:
-	var bone_idx := skeleton.find_bone(RIGHT_ARM_BONE)
-	if bone_idx == -1:
-		return
-	var arm_pos := skeleton.global_transform.origin
-	var to_target := (target_pos - arm_pos).normalized()
-	var arm_basis := skeleton.global_transform.basis
+	$ArmIKTargetRight.global_position = target_pos
+	$PlayerModel/Armature/Skeleton3D/SkeletonIK3DRight.start()
 
-	# Calculate the rotation to point along to_target, relative to arm's local space
-	var bone_transform := skeleton.get_bone_global_pose(bone_idx)
-	bone_transform = bone_transform.looking_at(target_pos, Vector3.UP)
-	skeleton.set_bone_global_pose_override(bone_idx, bone_transform, 1.0, true)
+@rpc("call_local")
+func point_left_arm_at(target_pos: Vector3) -> void:
+	$ArmIKTargetLeft.global_position = target_pos
+	$PlayerModel/Armature/Skeleton3D/SkeletonIK3DLeft.start()
 
 @rpc("call_local")
 func reset_right_arm() -> void:
-	var bone_idx := skeleton.find_bone(RIGHT_ARM_BONE)
-	if bone_idx == -1:
-		return
-	skeleton.set_bone_global_pose_override(bone_idx, Transform3D(), 0.0, true)
+	$PlayerModel/Armature/Skeleton3D/SkeletonIK3DRight.stop()
 
+@rpc("call_local")
+func reset_left_arm() -> void:
+	$PlayerModel/Armature/Skeleton3D/SkeletonIK3DLeft.stop()
+	
 func play_footstep() -> void:
 	if footstep_sounds.size() > 0:
 		var sound := footstep_sounds[randi() % footstep_sounds.size()]
