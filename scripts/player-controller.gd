@@ -89,7 +89,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	handle_animations(delta)
-	
+
 	if not multiplayer.is_server(): return
 
 	handle_inputs()
@@ -119,7 +119,7 @@ func handle_inputs() -> void:
 		try_jump()
 		input_synchronizer.jump_pressed = false
 
-	if input_synchronizer.dash_pressed: 
+	if input_synchronizer.dash_pressed:
 		if dash_cooldown_timer <= 0.0:
 			start_dash()
 		input_synchronizer.dash_pressed = false
@@ -137,19 +137,19 @@ func handle_inputs() -> void:
 	if input_synchronizer.crouch_pressed:
 		currAnim = AnimState.CROUCH
 		input_synchronizer.crouch_pressed = false
-	
+
 	if input_synchronizer.tag_pressed:
 		var target := get_closest_other_character()
 		if target and skeleton:
-			point_right_arm_at(target.global_position)
+			point_right_arm_at.rpc(target.global_position)
 		else:
-			reset_right_arm()
+			reset_right_arm.rpc()
 		input_synchronizer.tag_pressed = false
 	elif input_synchronizer.tag_released:
-		reset_right_arm()
+		reset_right_arm.rpc()
 		input_synchronizer.tag_released = false
 	else:
-		reset_right_arm()
+		reset_right_arm.rpc()
 
 func try_jump() -> void:
 	if is_on_floor():
@@ -210,13 +210,15 @@ func start_wall_run(normal: Vector3) -> void:
 	if not can_wall_run:
 		return
 	is_wall_running = true
-	currAnim = AnimState.WALL_RUN
+	fire_wallrun_animation.rpc()
 	wall_run_timer = WALL_RUN_DURATION
 	wall_normal = normal
 
 func stop_wall_run() -> void:
 	is_wall_running = false
 	wall_normal = Vector3.ZERO
+	anim_tree.set("parameters/fire_wallrun/request", AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FADE_OUT)
+
 
 func handle_wall_run(delta: float) -> void:
 	if is_wall_running:
@@ -270,7 +272,7 @@ func start_swing() -> void:
 	is_snapping = true
 
 func handle_swing(delta: float) -> void:
-	var torque := - SWING_ACCEL * sin(swing_angle)
+	var torque := -SWING_ACCEL * sin(swing_angle)
 	swing_speed += torque * delta
 	swing_speed *= 0.995
 	swing_angle += swing_speed * delta
@@ -326,6 +328,12 @@ func fire_jump_animation() -> void:
 	currAnim = AnimState.JUMP
 	anim_tree.set("parameters/fire_jump/request", AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FIRE)
 
+@rpc("call_local")
+func fire_wallrun_animation() -> void:
+	currAnim = AnimState.WALL_RUN
+	anim_tree.set("parameters/fire_wallrun/request", AnimationNodeOneShot.OneShotRequest.ONE_SHOT_REQUEST_FIRE)
+
+
 func update_animation_blend_values() -> void:
 	anim_tree.set("parameters/to_crouch/blend_amount", crouch_val)
 	anim_tree.set("parameters/to_hanging/blend_amount", hanging_val)
@@ -345,7 +353,8 @@ func get_closest_other_character() -> CharacterBody3D:
 			closest = player
 			closest_dist = dist
 	return closest
-	
+
+@rpc("call_local")
 func point_right_arm_at(target_pos: Vector3) -> void:
 	var bone_idx := skeleton.find_bone(RIGHT_ARM_BONE)
 	if bone_idx == -1:
@@ -359,6 +368,7 @@ func point_right_arm_at(target_pos: Vector3) -> void:
 	bone_transform = bone_transform.looking_at(target_pos, Vector3.UP)
 	skeleton.set_bone_global_pose_override(bone_idx, bone_transform, 1.0, true)
 
+@rpc("call_local")
 func reset_right_arm() -> void:
 	var bone_idx := skeleton.find_bone(RIGHT_ARM_BONE)
 	if bone_idx == -1:
