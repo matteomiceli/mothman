@@ -5,8 +5,7 @@ extends CharacterBody3D
 
 @onready var anim_tree := $PlayerModel/AnimationTree
 @onready var dash_bar := get_tree().get_root().get_node("Game/Mode/Singleplayer/World/DashCooldownLayer/DashCooldownBar")
-@onready var hoody_mesh: MeshInstance3D = $PlayerModel/Armature/Skeleton3D/Hoody
-@onready var skeleton: Skeleton3D = $PlayerModel/Armature/Skeleton3D # Adjust path to your skeleton
+@onready var player_model := $PlayerModel
 const RIGHT_ARM_BONE := "mixamorig10_RightArm"
 
 @onready var input_synchronizer := $Sync/InputSynchronizer
@@ -299,7 +298,8 @@ func set_swing_anchor(anchor: Node3D) -> void:
 	swing_anchor = anchor
 
 func apply_character_customization() -> void:
-	hoody_mesh.get_active_material(0).albedo_color = hoody_color
+	player_model.set_hoody_color(hoody_color)
+	player_model.set_player_xray_color(hoody_color)
 
 func handle_animations(delta: float) -> void:
 	var crouch_t := 0.0

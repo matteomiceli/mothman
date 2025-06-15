@@ -1,25 +1,7 @@
-[gd_resource type="StandardMaterial3D" load_steps=5 format=3 uid="uid://bajhpgg82epki"]
-
-[ext_resource type="Texture2D" uid="uid://g0v02eakcx7" path="res://assets/guy/guy_Ch28_1001_Diffuse.png" id="1_c0eoa"]
-[ext_resource type="Texture2D" uid="uid://cvn4u7argwhld" path="res://assets/guy/guy_Ch28_1001_Glossiness.png" id="2_mtg20"]
-[ext_resource type="Texture2D" uid="uid://kyfsiduoekjh" path="res://assets/guy/guy_Ch28_1001_Normal.png" id="3_dadqv"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smehm"]
-resource_name = "Ch28_body"
-render_priority = 1
-transparency = 4
-cull_mode = 2
-albedo_texture = ExtResource("1_c0eoa")
-metallic = 0.5
-metallic_texture = ExtResource("2_mtg20")
-metallic_texture_channel = 2
-roughness_texture = ExtResource("2_mtg20")
-roughness_texture_channel = 1
-normal_enabled = true
-normal_texture = ExtResource("3_dadqv")
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bajhpgg82epki"]
 
 [resource]
-next_pass = SubResource("StandardMaterial3D_smehm")
+resource_local_to_scene = true
 no_depth_test = true
 shading_mode = 0
 albedo_color = Color(0.52193, 0.278651, 0.659257, 1)
